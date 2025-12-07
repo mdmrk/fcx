@@ -25,7 +25,7 @@ export class SettingsMenuInjector {
 <div id="${this.overlayId}" class="dialog-screen" style="color: ${theme.textColor}">
 <div class="settings-container ${theme.bgClassName}">
 <div class="settings-header">
-	<div class="settings-title">FB Mobile - Clean my feeds</div>
+	<div class="settings-title">FCX</div>
 	<div class="settings-description">Mark filters to hide posts</div>
 </div>
 <div class="settings-items">

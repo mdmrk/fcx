@@ -29,11 +29,11 @@ jobs:
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
-        files: dist/fb-mobile-clean-my-feeds.user.js
+        files: dist/fcx.user.js
         tag_name: v${{ steps.version.outputs.version }}
         name: Release v${{ steps.version.outputs.version }}
         body: |
-          Automated release of FB Mobile - Clean my feeds
+          Automated release of FCX
           
           Built from commit: ${{ github.sha }}
       env:

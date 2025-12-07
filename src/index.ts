@@ -18,7 +18,7 @@ import { removeAppInstallPrompt } from "@/lib/remove-app-install-prompt"
 		return
 	}
 
-	injectConsole("FB Mobile - Clean my feeds (UserScript)")
+	injectConsole("FCX (UserScript)")
 	GM_addStyle(STYLES)
 
 	onReadyForScripting(() => {

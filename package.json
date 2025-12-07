@@ -1,10 +1,10 @@
 {
-  "name": "fb-mobile-clean-my-feeds",
-  "version": "1.03",
+  "name": "fcx",
+  "version": "0.0.1",
   "author": "https://github.com/webdevsk",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webdevsk/FB-Mobile-Clean-my-feeds.git"
+    "url": "git+https://github.com/webdevsk/fcx.git"
   },
   "module": "src/index.ts",
   "devDependencies": {
@@ -18,10 +18,10 @@
     "yargs": "17"
   },
   "bugs": {
-    "url": "https://github.com/webdevsk/FB-Mobile-Clean-my-feeds/issues"
+    "url": "https://github.com/webdevsk/fcx/issues"
   },
-  "description": "Removes Sponsored and Suggested posts from Facebook mobile chromium/react version",
-  "homepage": "https://github.com/webdevsk/FB-Mobile-Clean-my-feeds#readme",
+  "description": "Removes Sponsored and Suggested posts from Facebook feed",
+  "homepage": "https://github.com/webdevsk/fcx#readme",
   "license": "GNU General Public License v3.0",
   "scripts": {
     "build": "bun build.ts",
@@ -34,8 +34,7 @@
   },
   "type": "module",
   "userscriptHeader": {
-    "@name": "FB Mobile - Clean my feeds",
-    "@namespace": "Violentmonkey Scripts",
+    "@name": "FCX",
     "@match": [
       "https://m.facebook.com/*",
       "https://www.facebook.com/*",
@@ -48,8 +47,6 @@
       "GM_setValue",
       "GM_addStyle"
     ],
-    "@run-at": "document-end",
-    "@downloadURL": "https://update.greasyfork.org/scripts/479868/FB%20Mobile%20-%20Clean%20my%20feeds.user.js",
-    "@updateURL": "https://update.greasyfork.org/scripts/479868/FB%20Mobile%20-%20Clean%20my%20feeds.user.js"
+    "@run-at": "document-end"
   }
 }
