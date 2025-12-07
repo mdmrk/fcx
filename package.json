@@ -4,7 +4,7 @@
   "author": "mdmrk",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/webdevsk/fcx.git"
+    "url": "git+https://github.com/mdmrk/fcx.git"
   },
   "module": "src/index.ts",
   "devDependencies": {
@@ -18,7 +18,7 @@
     "yargs": "17"
   },
   "bugs": {
-    "url": "https://github.com/webdevsk/fcx/issues"
+    "url": "https://github.com/mdmrk/fcx/issues"
   },
   "description": "Removes Sponsored and Suggested posts from Facebook feed",
   "homepage": "https://github.com/webdevsk/fcx#readme",

@@ -1,23 +1,17 @@
-import { bodyId, devMode } from "@/config"
 import STYLES from "@/style.css"
-;(() => {
-	// Make sure this is the React-Mobile version of facebook
-	if (document.body.id !== bodyId) {
-		console.error("ID 'app-body' not found.")
-		return
-	}
+import { injectConsole } from "@/utils/inject-console"
 
-	GM_addStyle(STYLES)
+	; (() => {
+		injectConsole("FCX")
+		GM_addStyle(STYLES)
 
-	console.log("Ready for scripting")
+		console.log("Ready for scripting")
 
-	// Store all abort functions
-	const aborts: Array<() => void> = []
+		const aborts: Array<() => void> = []
 
-	return () => {
-		console.log("Not Ready for scripting")
-		// Cleanup code like removing dom nodes and destroying event listeners
-		aborts.forEach(abort => abort?.())
-		aborts.length = 0
-	}
-})()
+		return () => {
+			console.log("Not Ready for scripting")
+			aborts.forEach(abort => abort?.())
+			aborts.length = 0
+		}
+	})()
