@@ -1,17 +1,20 @@
 import STYLES from "@/style.css"
 import { injectConsole } from "@/utils/inject-console"
+import { watchFeed } from "@/lib/watch-feed"
+import { initInfiniteScroll } from "@/lib/infinite-scroll"
+import { devMode } from "@/config"
 
-	; (() => {
-		injectConsole("FCX")
-		GM_addStyle(STYLES)
+;(() => {
+	injectConsole("FCX")
+	GM_addStyle(STYLES)
 
-		console.log("Ready for scripting")
+	if (devMode) console.log("Script initializing...")
 
-		const aborts: Array<() => void> = []
+	const cleanupWatcher = watchFeed()
+	initInfiniteScroll()
 
-		return () => {
-			console.log("Not Ready for scripting")
-			aborts.forEach(abort => abort?.())
-			aborts.length = 0
-		}
-	})()
+	return () => {
+		cleanupWatcher()
+		if (devMode) console.log("Script unloaded")
+	}
+})()

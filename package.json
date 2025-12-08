@@ -20,7 +20,7 @@
   "bugs": {
     "url": "https://github.com/mdmrk/fcx/issues"
   },
-  "description": "Removes Sponsored and Suggested posts from Facebook feed",
+  "description": "FCX",
   "homepage": "https://github.com/webdevsk/fcx#readme",
   "license": "GNU General Public License v3.0",
   "scripts": {

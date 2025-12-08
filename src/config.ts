@@ -1,17 +1,15 @@
-/**
- * Enables verbose console logging and counter
- */
-export const devMode = false
-/**
- * bodyId is the id of the body element. Comes with HTML. It will surely be there
- */
-export const bodyId = ""
-/**
- * a default theme. Will be updated based on user theme preference once the main function runs
- */
+export const devMode = true
+
 export const theme = {
-	textColor: "ffffff",
-	iconColor: "e4e6eb",
-	bgClassName: "bg-fallback",
-	iconBgClassName: "icon-bg-fallback",
+	enhancedCommentClass: "enhanced-comment",
+}
+
+export const selectors = {
+	feedContainer: "#posts",
+	commentItem: "table[id^='post']",
+	avatar: ".avatar",
+	authorName: ".bigusername",
+	content: "div[id^='post_message_']",
+
+	nextPageLink: "a[rel='next']",
 }
