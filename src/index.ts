@@ -3,6 +3,7 @@ import { injectConsole } from "@/utils/inject-console"
 
 import { devMode } from "@/config"
 import { isNewInterface } from "@/utils/detect-interface"
+import { currentPageType } from "@/utils/page-state"
 import { NewSiteAdapter } from "@/adapters/new-adapter"
 import { OldSiteAdapter } from "@/adapters/old-adapter"
 import type { SiteAdapter } from "@/types/adapter"
@@ -15,6 +16,7 @@ import type { SiteAdapter } from "@/types/adapter"
 	if (devMode) {
 		console.log("Script initializing...")
 		console.log(`Interface: ${isNew ? "New" : "Old"}`)
+		console.log(`Page Type: ${currentPageType}`)
 	}
 
 	const adapter: SiteAdapter = isNew

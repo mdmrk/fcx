@@ -13,6 +13,15 @@ export class NewSiteAdapter implements SiteAdapter {
 
 	init() {
 		if (devMode) console.log(`Initializing ${this.name} adapter...`)
+		this.removeSidebar()
+	}
+
+	private removeSidebar() {
+		const sidebar = document.querySelector("#sidebar")
+		if (sidebar) sidebar.remove()
+
+		const main = document.querySelector("main")
+		if (main) main.style.display = "block"
 	}
 
 	setupFeatures() {

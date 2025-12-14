@@ -1,3 +1,3 @@
 export const isNewInterface = (): boolean => {
-	return !!document.querySelector('meta[name="description"]')
+	return !!document.getElementById("fc-desktop-version-tag-for-monitoring")
 }
