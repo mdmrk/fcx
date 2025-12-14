@@ -1,9 +1,12 @@
-import { devMode, selectors } from "@/config"
+import { devMode } from "@/config"
+import type { SelectorConfig } from "@/types/adapter"
 
 let isLoading = false
 let nextUrl: string | null = null
+let currentSelectors: SelectorConfig | null = null
 
-export const initInfiniteScroll = () => {
+export const initInfiniteScroll = (selectors: SelectorConfig) => {
+	currentSelectors = selectors
 	const nextLink = document.querySelector<HTMLAnchorElement>(
 		selectors.nextPageLink
 	)
@@ -48,15 +51,15 @@ const loadNextPage = async () => {
 		const text = await response.text()
 		const parser = new DOMParser()
 		const doc = parser.parseFromString(text, "text/html")
-		const newFeed = doc.querySelector(selectors.feedContainer)
-		const currentFeed = document.querySelector(selectors.feedContainer)
+		const newFeed = doc.querySelector(currentSelectors!.feedContainer)
+		const currentFeed = document.querySelector(currentSelectors!.feedContainer)
 
 		if (newFeed && currentFeed) {
-			const divider = document.createElement("div")
-			divider.innerHTML = `<span style="background:#eee; padding: 5px 10px; border-radius: 4px;">Page Loaded from: ${nextUrl}</span>`
-			divider.style.textAlign = "center"
-			divider.style.margin = "20px 0"
-			currentFeed.appendChild(divider)
+			// const divider = document.createElement("div")
+			// divider.innerHTML = `<span style="background:#eee; padding: 5px 10px; border-radius: 4px;"> ${nextUrl}</span>`
+			// divider.style.textAlign = "center"
+			// divider.style.margin = "20px 0"
+			// currentFeed.appendChild(divider)
 
 			Array.from(newFeed.children).forEach(child => {
 				const importedNode = document.importNode(child, true)
@@ -65,7 +68,7 @@ const loadNextPage = async () => {
 		}
 
 		const nextLink = doc.querySelector<HTMLAnchorElement>(
-			selectors.nextPageLink
+			currentSelectors!.nextPageLink
 		)
 		if (nextLink) {
 			nextUrl = nextLink.href

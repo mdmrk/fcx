@@ -4,7 +4,7 @@ export const theme = {
 	enhancedCommentClass: "enhanced-comment",
 }
 
-export const selectors = {
+export const oldSelectors = {
 	feedContainer: "#posts",
 	commentItem: "table[id^='post']",
 	avatar: ".avatar",
@@ -12,4 +12,13 @@ export const selectors = {
 	content: "div[id^='post_message_']",
 
 	nextPageLink: "a[rel='next']",
+}
+
+export const newSelectors = {
+	feedContainer: "#posts",
+	commentItem: ".postbit_wrapper",
+	avatar: ".thread-profile-image",
+	authorName: "div[id^='postmenu_'] > a",
+	content: "div[id^='post_message_']",
+	nextPageLink: "a:has(span[style*='--next-right-icon'])",
 }
