@@ -4,6 +4,7 @@ import { initInfiniteScroll } from "@/lib/infinite-scroll"
 import { devMode, newSelectors } from "@/config"
 import { getConfig } from "@/utils/storage"
 import { CONFIG_KEYS } from "@/config-registry"
+import { removeBanners } from "@/lib/remove-banners"
 
 export class NewSiteAdapter implements SiteAdapter {
 	name = "New Interface"
@@ -16,6 +17,7 @@ export class NewSiteAdapter implements SiteAdapter {
 	init() {
 		if (devMode) console.log(`Initializing ${this.name} adapter...`)
 		this.removeSidebar()
+		removeBanners()
 	}
 
 	private removeSidebar() {

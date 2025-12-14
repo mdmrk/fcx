@@ -3,6 +3,7 @@ import { ConfigSection, type ConfigDefinition } from "@/types/config"
 export const CONFIG_KEYS = {
 	REMOVE_SIDEBAR: "remove_sidebar",
 	INFINITE_SCROLL: "infinite_scroll",
+	REMOVE_BANNERS: "remove_banners",
 }
 
 export const configs: ConfigDefinition[] = [
@@ -21,6 +22,14 @@ export const configs: ConfigDefinition[] = [
 		label: "Scroll Infinito",
 		description:
 			"Carga automáticamente la siguiente página de hilos al llegar al final.",
+		defaultValue: true,
+		type: "checkbox",
+	},
+	{
+		key: CONFIG_KEYS.REMOVE_BANNERS,
+		section: ConfigSection.COMMON,
+		label: "Eliminar Publicidad",
+		description: "Oculta los banners de publicidad.",
 		defaultValue: true,
 		type: "checkbox",
 	},

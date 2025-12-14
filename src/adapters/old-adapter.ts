@@ -3,6 +3,7 @@ import { oldSelectors } from "@/config"
 import { watchFeed } from "@/lib/watch-feed"
 import { initInfiniteScroll } from "@/lib/infinite-scroll"
 import { devMode } from "@/config"
+import { removeBanners } from "@/lib/remove-banners"
 
 export class OldSiteAdapter implements SiteAdapter {
 	name = "Old Interface"
@@ -14,6 +15,7 @@ export class OldSiteAdapter implements SiteAdapter {
 
 	init() {
 		if (devMode) console.log(`Initializing ${this.name} adapter...`)
+		removeBanners()
 	}
 
 	setupFeatures() {
