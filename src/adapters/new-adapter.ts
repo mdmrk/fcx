@@ -2,6 +2,8 @@ import type { SiteAdapter, SelectorConfig } from "@/types/adapter"
 import { watchFeed } from "@/lib/watch-feed"
 import { initInfiniteScroll } from "@/lib/infinite-scroll"
 import { devMode, newSelectors } from "@/config"
+import { getConfig } from "@/utils/storage"
+import { CONFIG_KEYS } from "@/config-registry"
 
 export class NewSiteAdapter implements SiteAdapter {
 	name = "New Interface"
@@ -17,6 +19,9 @@ export class NewSiteAdapter implements SiteAdapter {
 	}
 
 	private removeSidebar() {
+		const shouldRemove = getConfig(CONFIG_KEYS.REMOVE_SIDEBAR, true)
+		if (!shouldRemove) return
+
 		const sidebar = document.querySelector("#sidebar")
 		if (sidebar) sidebar.remove()
 
@@ -26,6 +31,8 @@ export class NewSiteAdapter implements SiteAdapter {
 
 	setupFeatures() {
 		watchFeed(this.selectors)
-		initInfiniteScroll(this.selectors)
+		if (getConfig(CONFIG_KEYS.INFINITE_SCROLL, true)) {
+			initInfiniteScroll(this.selectors)
+		}
 	}
 }
