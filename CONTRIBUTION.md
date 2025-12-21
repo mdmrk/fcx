@@ -10,11 +10,14 @@ DO NOT work on the code from GreasyFork. It is built code. Work on this reposito
 ## Getting Started
 
 ### Clone the repository
+
 ```bash
-git clone https://github.com/webdevsk/FB-Mobile-Clean-my-feeds.git
-cd FB-Mobile-Clean-my-feeds
+git clone https://github.com/mdmrk/fcx.git
+cd fcx
 ```
+
 ### Install dependencies
+
 ```bash
 bun install
 ```
@@ -22,6 +25,7 @@ bun install
 ## Development
 
 ### Start development server
+
 ```bash
 # Without hosted local server
 bun run build:watch
@@ -31,6 +35,7 @@ bun dev
 ```
 
 ### Build for GreasyFork
+
 ```bash
 bun run build:greasyfork
 ```
@@ -39,20 +44,20 @@ bun run build:greasyfork
 
 ### Project structure
 
-* [dist](dist) - Built files (Output)
-* [src](src) - Source files
-	+ [config.ts](src/config.ts) - Global config like devMode, runScriptOn, node selectors, theme configuration, etc
-	+ [index.ts](src/index.ts) - Entry point. Code starts here
-	+ [data](src/data) - Data files
-		- [filters-database.ts](src/data/filters-database.ts) - Filter database. This is where you can add new categories, as well as the entries for settings menu
-		- [keywords-per-language.ts](src/data/keywords-per-language.ts) - Keywords per language. This is where you can add new keywords for each language (Language detection is still unstable)
-	+ [lib](src/lib) - Library files
-		- [menu-buttons-injector.ts](src/lib/menu-buttons-injector.ts) - Settings Menu and Recent Feeds button
-		- [settings-menu-injector.ts](src/lib/settings-menu-injector.ts) - Settings Page/Overlay and event listeners
-		- [run-feeds-cleaner.ts](src/lib/run-feeds-cleaner.ts) - Mutation Observer that observes and scans posts for unwanted posts
-		- [purge-element.ts](src/lib/purge-element.ts) - Function that handles removal of unwanted posts
-		- [whitelisted-filters-storage.ts](src/lib/whitelisted-filters-storage.ts) - Whitelisted filters handler
-		- [on-ready-for-scripting.ts](src/lib/on-ready-for-scripting.ts) - The brain of this project. Handles WHEN to inject the nodes, observers and remove them based on page navigation, url match etc.
+- [dist](dist) - Built files (Output)
+- [src](src) - Source files
+  - [config.ts](src/config.ts) - Global config like devMode, runScriptOn, node selectors, theme configuration, etc
+  - [index.ts](src/index.ts) - Entry point. Code starts here
+  - [data](src/data) - Data files
+    - [filters-database.ts](src/data/filters-database.ts) - Filter database. This is where you can add new categories, as well as the entries for settings menu
+    - [keywords-per-language.ts](src/data/keywords-per-language.ts) - Keywords per language. This is where you can add new keywords for each language (Language detection is still unstable)
+  - [lib](src/lib) - Library files
+    - [menu-buttons-injector.ts](src/lib/menu-buttons-injector.ts) - Settings Menu and Recent Feeds button
+    - [settings-menu-injector.ts](src/lib/settings-menu-injector.ts) - Settings Page/Overlay and event listeners
+    - [run-feeds-cleaner.ts](src/lib/run-feeds-cleaner.ts) - Mutation Observer that observes and scans posts for unwanted posts
+    - [purge-element.ts](src/lib/purge-element.ts) - Function that handles removal of unwanted posts
+    - [whitelisted-filters-storage.ts](src/lib/whitelisted-filters-storage.ts) - Whitelisted filters handler
+    - [on-ready-for-scripting.ts](src/lib/on-ready-for-scripting.ts) - The brain of this project. Handles WHEN to inject the nodes, observers and remove them based on page navigation, url match etc.
 
 ## Guidelines
 

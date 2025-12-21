@@ -169,9 +169,9 @@ function generateHeader(
 
   const releaseHeader = releaseURL
     ? {
-      "@updateURL": releaseURL,
-      "@downloadURL": releaseURL,
-    }
+        "@updateURL": releaseURL,
+        "@downloadURL": releaseURL,
+      }
     : null
 
   const defaultHeader: MinimalUserScriptHeader = {
@@ -190,7 +190,7 @@ function generateHeader(
   for (const key in packageJson.userscriptHeader) {
     const value =
       packageJson.userscriptHeader[
-      key as keyof typeof packageJson.userscriptHeader
+        key as keyof typeof packageJson.userscriptHeader
       ]
     if (typeof key !== "string") {
       logger.warn(
@@ -263,7 +263,11 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
   }
 
   for (const key in header) {
-    if (MINIMAL_USER_SCRIPT_HEADER_SET.has(key as (typeof MINIMAL_USER_SCRIPT_HEADER_ITEMS)[number])) {
+    if (
+      MINIMAL_USER_SCRIPT_HEADER_SET.has(
+        key as (typeof MINIMAL_USER_SCRIPT_HEADER_ITEMS)[number]
+      )
+    ) {
       continue
     }
     const value = header[key]

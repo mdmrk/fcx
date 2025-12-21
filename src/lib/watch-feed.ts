@@ -9,7 +9,7 @@ import type { SelectorConfig } from "@/types/adapter"
 export const watchFeed = (selectors: SelectorConfig): (() => void) => {
   if (!window.location.href.includes("showthread.php")) {
     if (devMode) console.log("Not a thread page, skipping feed watcher.")
-    return () => { }
+    return () => {}
   }
 
   const feed = document.querySelector<HTMLElement>(selectors.feedContainer)
