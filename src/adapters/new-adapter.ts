@@ -7,34 +7,34 @@ import { CONFIG_KEYS } from "@/config-registry"
 import { removeBanners } from "@/lib/remove-banners"
 
 export class NewSiteAdapter implements SiteAdapter {
-	name = "New Interface"
-	selectors: SelectorConfig
+  name = "New Interface"
+  selectors: SelectorConfig
 
-	constructor() {
-		this.selectors = newSelectors
-	}
+  constructor() {
+    this.selectors = newSelectors
+  }
 
-	init() {
-		if (devMode) console.log(`Initializing ${this.name} adapter...`)
-		this.removeSidebar()
-		removeBanners()
-	}
+  init() {
+    if (devMode) console.log(`Initializing ${this.name} adapter...`)
+    this.removeSidebar()
+    removeBanners()
+  }
 
-	private removeSidebar() {
-		const shouldRemove = getConfig(CONFIG_KEYS.REMOVE_SIDEBAR, true)
-		if (!shouldRemove) return
+  private removeSidebar() {
+    const shouldRemove = getConfig(CONFIG_KEYS.REMOVE_SIDEBAR, true)
+    if (!shouldRemove) return
 
-		const sidebar = document.querySelector("#sidebar")
-		if (sidebar) sidebar.remove()
+    const sidebar = document.querySelector("#sidebar")
+    if (sidebar) sidebar.remove()
 
-		const main = document.querySelector("main")
-		if (main) main.style.display = "block"
-	}
+    const main = document.querySelector("main")
+    if (main) main.style.display = "block"
+  }
 
-	setupFeatures() {
-		watchFeed(this.selectors)
-		if (getConfig(CONFIG_KEYS.INFINITE_SCROLL, true)) {
-			initInfiniteScroll(this.selectors)
-		}
-	}
+  setupFeatures() {
+    watchFeed(this.selectors)
+    if (getConfig(CONFIG_KEYS.INFINITE_SCROLL, true)) {
+      initInfiniteScroll(this.selectors)
+    }
+  }
 }

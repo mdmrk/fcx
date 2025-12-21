@@ -78,10 +78,10 @@ const logger = winston.createLogger({
     winston.format.timestamp(),
     winston.format.cli(),
     winston.format.printf(
-      (info) =>
+      info =>
         `${info.timestamp} ${info.level}: ${info.message}` +
-        (info.splat !== undefined ? `${info.splat}` : " "),
-    ),
+        (info.splat !== undefined ? `${info.splat}` : " ")
+    )
   ),
   transports: [consoleTransport],
   exceptionHandlers: [consoleTransport],
@@ -100,9 +100,7 @@ const MINIMAL_USER_SCRIPT_HEADER_ITEMS = [
 
 const MINIMAL_USER_SCRIPT_HEADER_SET: Set<
   (typeof MINIMAL_USER_SCRIPT_HEADER_ITEMS)[number]
-> = new Set(
-  MINIMAL_USER_SCRIPT_HEADER_ITEMS,
-)
+> = new Set(MINIMAL_USER_SCRIPT_HEADER_ITEMS)
 
 type MinimalUserScriptHeader = {
   [K in (typeof MINIMAL_USER_SCRIPT_HEADER_ITEMS)[number]]: string[] | string
@@ -126,7 +124,7 @@ type ReleaseChannel = (typeof VALID_RELEASE_CHANNELS)[number]
 
 function generateReleaseURL(
   releaseChannel: ReleaseChannel,
-  inputs: { repoURL: string; name: string },
+  inputs: { repoURL: string; name: string }
 ): string {
   if (releaseChannel === "OutOfBand") {
     return ""
@@ -145,7 +143,7 @@ function generateReleaseURL(
 
 function generateHeader(
   releaseChannel: ReleaseChannel,
-  packageJson: typeof PACKAGE_JSON,
+  packageJson: typeof PACKAGE_JSON
 ): UserScriptHeader {
   if (
     !packageJson.name ||
@@ -159,10 +157,9 @@ function generateHeader(
   }
 
   // const distUserScript = `${PACKAGE_JSON.name}.user.js`;
-  const url = (packageJson.repository as { url: string }).url.replace(
-    "git+",
-    "",
-  ).replace(".git", "")
+  const url = (packageJson.repository as { url: string }).url
+    .replace("git+", "")
+    .replace(".git", "")
   // const updateUrl = `${url}/raw/main/dist/${distUserScript}`;
   // const downloadUrl = updateUrl;
 
@@ -173,9 +170,9 @@ function generateHeader(
 
   const releaseHeader = releaseURL
     ? {
-      "@updateURL": releaseURL,
-      "@downloadURL": releaseURL,
-    }
+        "@updateURL": releaseURL,
+        "@downloadURL": releaseURL,
+      }
     : null
 
   const defaultHeader: MinimalUserScriptHeader = {
@@ -192,11 +189,13 @@ function generateHeader(
   }
 
   for (const key in packageJson.userscriptHeader) {
-    const value = packageJson
-      .userscriptHeader[key as keyof typeof packageJson.userscriptHeader]
+    const value =
+      packageJson.userscriptHeader[
+        key as keyof typeof packageJson.userscriptHeader
+      ]
     if (typeof key !== "string") {
       logger.warn(
-        `ignore non-string key in userscript header: "${key}"="${value}"`,
+        `ignore non-string key in userscript header: "${key}"="${value}"`
       )
     }
 
@@ -232,9 +231,7 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
     header["@version"] += `.${buildSuffix}`
   }
 
-  const longestHeaderChar = Math.max(
-    ...Object.keys(header).map((k) => k.length),
-  )
+  const longestHeaderChar = Math.max(...Object.keys(header).map(k => k.length))
 
   const HEADER_BEGIN = "// ==UserScript==\n"
   const HEADER_END = "// ==/UserScript==\n\n"
@@ -248,7 +245,7 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
   for (const api of usedApis ?? []) {
     if (!grants?.includes(api)) {
       logger.error(
-        `Used "${api}" api without permissions. Include it in package.json/userscriptHeader/@grant`,
+        `Used "${api}" api without permissions. Include it in package.json/userscriptHeader/@grant`
       )
     }
   }
@@ -304,9 +301,11 @@ async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
 
     if (hasExports) {
       throw new Error(
-        `${
-          entrypoint.split("/").at(-1)
-        } should not contain exports. Move exports to a separate file (e.g. config.ts).`,
+        `${entrypoint
+          .split("/")
+          .at(
+            -1
+          )} should not contain exports. Move exports to a separate file (e.g. config.ts).`
       )
     }
 
@@ -328,8 +327,8 @@ async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
 
     if (!build.success) throw new Error(build.logs.join("\n"))
 
-    const entrypointPath = build.outputs.find((artifact) =>
-      artifact.kind === "entry-point"
+    const entrypointPath = build.outputs.find(
+      artifact => artifact.kind === "entry-point"
     )?.path
     logger.info(`Running post build script with entrypoint ${entrypointPath}.`)
 
@@ -372,7 +371,7 @@ function watch(option: BuildOption): Watcher {
     `${import.meta.dir}/src`,
     `${import.meta.dir}/package.json`,
   ]
-  const watchers = watchPaths.map((path) =>
+  const watchers = watchPaths.map(path =>
     fswatch(path, { recursive: true }, listener)
   )
   logger.info(`Watching paths ${watchPaths.join(", ")}`)
@@ -380,7 +379,7 @@ function watch(option: BuildOption): Watcher {
     close: () => {
       logger.info("Closing watcher...")
       stopped = true
-      watchers.forEach((watcher) => watcher.close())
+      watchers.forEach(watcher => watcher.close())
     },
   }
 }

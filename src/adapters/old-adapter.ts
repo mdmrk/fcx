@@ -6,20 +6,20 @@ import { devMode } from "@/config"
 import { removeBanners } from "@/lib/remove-banners"
 
 export class OldSiteAdapter implements SiteAdapter {
-	name = "Old Interface"
-	selectors: SelectorConfig
+  name = "Old Interface"
+  selectors: SelectorConfig
 
-	constructor() {
-		this.selectors = oldSelectors
-	}
+  constructor() {
+    this.selectors = oldSelectors
+  }
 
-	init() {
-		if (devMode) console.log(`Initializing ${this.name} adapter...`)
-		removeBanners()
-	}
+  init() {
+    if (devMode) console.log(`Initializing ${this.name} adapter...`)
+    removeBanners()
+  }
 
-	setupFeatures() {
-		watchFeed(this.selectors)
-		initInfiniteScroll(this.selectors)
-	}
+  setupFeatures() {
+    watchFeed(this.selectors)
+    initInfiniteScroll(this.selectors)
+  }
 }

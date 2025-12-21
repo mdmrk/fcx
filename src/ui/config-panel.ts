@@ -59,144 +59,144 @@ fieldset.fcx-group legend {
 // --- Components ---
 
 const renderItem = (item: ConfigDefinition) => {
-	const div = document.createElement("div")
-	div.className = "fcx-item"
-	div.dataset.name = item.label
+  const div = document.createElement("div")
+  div.className = "fcx-item"
+  div.dataset.name = item.label
 
-	const left = document.createElement("div")
+  const left = document.createElement("div")
 
-	// Checkbox & Label
-	const label = document.createElement("label")
-	const input = document.createElement("input")
-	input.type = "checkbox"
-	input.style.marginRight = "5px"
-	input.style.verticalAlign = "middle"
-	input.checked = getConfig(item.key, item.defaultValue)
+  // Checkbox & Label
+  const label = document.createElement("label")
+  const input = document.createElement("input")
+  input.type = "checkbox"
+  input.style.marginRight = "5px"
+  input.style.verticalAlign = "middle"
+  input.checked = getConfig(item.key, item.defaultValue)
 
-	input.onchange = e => {
-		setConfig(item.key, (e.target as HTMLInputElement).checked)
-	}
+  input.onchange = e => {
+    setConfig(item.key, (e.target as HTMLInputElement).checked)
+  }
 
-	label.append(input, item.label)
+  label.append(input, item.label)
 
-	// Description
-	const desc = document.createElement("span")
-	desc.className = "fcx-desc"
-	desc.textContent = `: ${item.description || ""}`
+  // Description
+  const desc = document.createElement("span")
+  desc.className = "fcx-desc"
+  desc.textContent = `: ${item.description || ""}`
 
-	left.append(label, desc)
+  left.append(label, desc)
 
-	// Reset Button
-	const reset = document.createElement("button")
-	reset.className = "fcx-reset"
-	reset.textContent = "Reset"
-	reset.title = "Restaurar valores predeterminados"
-	reset.onclick = () => {
-		resetConfig(item.key, item.defaultValue)
-		input.checked = item.defaultValue as boolean
-		setConfig(item.key, item.defaultValue)
-	}
+  // Reset Button
+  const reset = document.createElement("button")
+  reset.className = "fcx-reset"
+  reset.textContent = "Reset"
+  reset.title = "Restaurar valores predeterminados"
+  reset.onclick = () => {
+    resetConfig(item.key, item.defaultValue)
+    input.checked = item.defaultValue as boolean
+    setConfig(item.key, item.defaultValue)
+  }
 
-	div.append(left, reset)
-	return div
+  div.append(left, reset)
+  return div
 }
 
 export const toggleConfigPanel = () => {
-	if (document.getElementById("fcx-config-panel")) {
-		closePanel()
-		return
-	}
-	openPanel()
+  if (document.getElementById("fcx-config-panel")) {
+    closePanel()
+    return
+  }
+  openPanel()
 }
 
 const openPanel = () => {
-	// Inject Styles if not present
-	if (!document.getElementById("fcx-styles")) {
-		const styleInfo = document.createElement("style")
-		styleInfo.id = "fcx-styles"
-		styleInfo.textContent = STYLES
-		document.head.append(styleInfo)
-	}
+  // Inject Styles if not present
+  if (!document.getElementById("fcx-styles")) {
+    const styleInfo = document.createElement("style")
+    styleInfo.id = "fcx-styles"
+    styleInfo.textContent = STYLES
+    document.head.append(styleInfo)
+  }
 
-	const backdrop = document.createElement("div")
-	backdrop.id = "fcx-config-backdrop"
-	backdrop.onclick = closePanel
+  const backdrop = document.createElement("div")
+  backdrop.id = "fcx-config-backdrop"
+  backdrop.onclick = closePanel
 
-	const panel = document.createElement("div")
-	panel.id = "fcx-config-panel"
+  const panel = document.createElement("div")
+  panel.id = "fcx-config-panel"
 
-	// 1. Header
-	const header = document.createElement("div")
-	header.id = "fcx-config-header"
-	header.textContent = "Configuración FCX"
+  // 1. Header
+  const header = document.createElement("div")
+  header.id = "fcx-config-header"
+  header.textContent = "Configuración FCX"
 
-	// 2. Content Area
-	const content = document.createElement("div")
-	content.id = "fcx-config-content"
+  // 2. Content Area
+  const content = document.createElement("div")
+  content.id = "fcx-config-content"
 
-	const sections = Object.values(ConfigSection)
+  const sections = Object.values(ConfigSection)
 
-	sections.forEach(sec => {
-		const currentItems = configs.filter(c => c.section === sec)
-		if (currentItems.length > 0) {
-			const fieldset = document.createElement("fieldset")
-			fieldset.className = "fcx-group"
-			const legend = document.createElement("legend")
-			legend.textContent = sec
-			fieldset.append(legend)
+  sections.forEach(sec => {
+    const currentItems = configs.filter(c => c.section === sec)
+    if (currentItems.length > 0) {
+      const fieldset = document.createElement("fieldset")
+      fieldset.className = "fcx-group"
+      const legend = document.createElement("legend")
+      legend.textContent = sec
+      fieldset.append(legend)
 
-			currentItems.forEach(item => {
-				fieldset.append(renderItem(item))
-			})
-			content.append(fieldset)
-		} else {
-			const msg = document.createElement("div")
-			msg.style.padding = "20px"
-			msg.style.color = "#666"
-			msg.textContent = "No hay opciones en esta sección aún."
-			content.append(msg)
-		}
-	})
+      currentItems.forEach(item => {
+        fieldset.append(renderItem(item))
+      })
+      content.append(fieldset)
+    } else {
+      const msg = document.createElement("div")
+      msg.style.padding = "20px"
+      msg.style.color = "#666"
+      msg.textContent = "No hay opciones en esta sección aún."
+      content.append(msg)
+    }
+  })
 
-	// 3. Footer
-	const footer = document.createElement("div")
-	footer.id = "fcx-footer"
-	const closeLink = document.createElement("a")
-	closeLink.textContent = "Cerrar"
-	closeLink.onclick = closePanel
+  // 3. Footer
+  const footer = document.createElement("div")
+  footer.id = "fcx-footer"
+  const closeLink = document.createElement("a")
+  closeLink.textContent = "Cerrar"
+  closeLink.onclick = closePanel
 
-	// Global reset
-	const resetLink = document.createElement("a")
-	resetLink.textContent = "Restaurar todo"
-	resetLink.onclick = () => {
-		if (confirm("¿Restaurar toda la configuración?")) {
-			configs.forEach(c => resetConfig(c.key, c.defaultValue))
-			closePanel()
-			openPanel() // Re-render
-		}
-	}
-	footer.append(resetLink, document.createTextNode(" | "), closeLink)
+  // Global reset
+  const resetLink = document.createElement("a")
+  resetLink.textContent = "Restaurar todo"
+  resetLink.onclick = () => {
+    if (confirm("¿Restaurar toda la configuración?")) {
+      configs.forEach(c => resetConfig(c.key, c.defaultValue))
+      closePanel()
+      openPanel() // Re-render
+    }
+  }
+  footer.append(resetLink, document.createTextNode(" | "), closeLink)
 
-	panel.append(header, content, footer)
-	document.body.append(backdrop, panel)
+  panel.append(header, content, footer)
+  document.body.append(backdrop, panel)
 
-	// Animate In
-	requestAnimationFrame(() => {
-		backdrop.style.opacity = "1"
-		panel.style.opacity = "1"
-		panel.style.transform = "translate(-50%, -50%) scale(1)"
-	})
+  // Animate In
+  requestAnimationFrame(() => {
+    backdrop.style.opacity = "1"
+    panel.style.opacity = "1"
+    panel.style.transform = "translate(-50%, -50%) scale(1)"
+  })
 }
 
 const closePanel = () => {
-	const b = document.getElementById("fcx-config-backdrop")
-	const p = document.getElementById("fcx-config-panel")
-	if (b && p) {
-		b.style.opacity = "0"
-		p.style.opacity = "0"
-		setTimeout(() => {
-			b.remove()
-			p.remove()
-		}, 200)
-	}
+  const b = document.getElementById("fcx-config-backdrop")
+  const p = document.getElementById("fcx-config-panel")
+  if (b && p) {
+    b.style.opacity = "0"
+    p.style.opacity = "0"
+    setTimeout(() => {
+      b.remove()
+      p.remove()
+    }, 200)
+  }
 }
