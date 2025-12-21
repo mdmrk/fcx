@@ -1,11 +1,10 @@
+import { watch as fswatch, type WatchListener } from "node:fs"
+import path from "node:path"
 import styleLoader from "bun-style-loader"
-import { watch as fswatch, type WatchListener } from "fs"
 import winston from "winston"
 import yargs from "yargs"
 import { hideBin } from "yargs/helpers"
-import PACKAGE_JSON from "./package.json"
-
-import path from "path"
+import type PACKAGE_JSON from "./package.json"
 
 const allGMApis = [
   "unsafeWindow",
@@ -170,9 +169,9 @@ function generateHeader(
 
   const releaseHeader = releaseURL
     ? {
-        "@updateURL": releaseURL,
-        "@downloadURL": releaseURL,
-      }
+      "@updateURL": releaseURL,
+      "@downloadURL": releaseURL,
+    }
     : null
 
   const defaultHeader: MinimalUserScriptHeader = {
@@ -191,7 +190,7 @@ function generateHeader(
   for (const key in packageJson.userscriptHeader) {
     const value =
       packageJson.userscriptHeader[
-        key as keyof typeof packageJson.userscriptHeader
+      key as keyof typeof packageJson.userscriptHeader
       ]
     if (typeof key !== "string") {
       logger.warn(
@@ -264,8 +263,7 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
   }
 
   for (const key in header) {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    if (MINIMAL_USER_SCRIPT_HEADER_SET.has(key as any)) {
+    if (MINIMAL_USER_SCRIPT_HEADER_SET.has(key as (typeof MINIMAL_USER_SCRIPT_HEADER_ITEMS)[number])) {
       continue
     }
     const value = header[key]
@@ -379,7 +377,9 @@ function watch(option: BuildOption): Watcher {
     close: () => {
       logger.info("Closing watcher...")
       stopped = true
-      watchers.forEach(watcher => watcher.close())
+      watchers.forEach(watcher => {
+        watcher.close()
+      })
     },
   }
 }

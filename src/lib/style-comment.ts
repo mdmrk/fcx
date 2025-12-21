@@ -1,4 +1,4 @@
-import { devMode, theme } from "@/config"
+import { theme } from "@/config"
 import type { SelectorConfig } from "@/types/adapter"
 
 /**
@@ -7,7 +7,7 @@ import type { SelectorConfig } from "@/types/adapter"
  */
 export const styleComment = (
   element: HTMLElement,
-  selectors: SelectorConfig
+  _selectors: SelectorConfig
 ) => {
   if (element.dataset.processed === "true") return
 

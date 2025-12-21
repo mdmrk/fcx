@@ -4,13 +4,13 @@ export enum ConfigSection {
   OLD_INTERFACE = "Antigua Interfaz",
 }
 
-export interface ConfigDefinition<T = any> {
+export type ConfigValue = string | number | boolean
+
+export interface ConfigDefinition {
   key: string
   section: ConfigSection
   label: string
-  description?: string
-  defaultValue: T
+  description: string
+  defaultValue: ConfigValue
   type: "checkbox" | "text" | "number"
 }
-
-export type ConfigValue = string | number | boolean

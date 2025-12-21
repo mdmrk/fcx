@@ -2,7 +2,6 @@ import { configs } from "@/config-registry"
 import { ConfigSection, type ConfigDefinition } from "@/types/config"
 import { getConfig, setConfig, resetConfig } from "@/utils/storage"
 
-// --- Styles ---
 const STYLES = `
 #fcx-config-backdrop {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -56,8 +55,6 @@ fieldset.fcx-group legend {
 #fcx-footer a:hover { color: #ccc; }
 `
 
-// --- Components ---
-
 const renderItem = (item: ConfigDefinition) => {
   const div = document.createElement("div")
   div.className = "fcx-item"
@@ -65,7 +62,6 @@ const renderItem = (item: ConfigDefinition) => {
 
   const left = document.createElement("div")
 
-  // Checkbox & Label
   const label = document.createElement("label")
   const input = document.createElement("input")
   input.type = "checkbox"
@@ -79,14 +75,12 @@ const renderItem = (item: ConfigDefinition) => {
 
   label.append(input, item.label)
 
-  // Description
   const desc = document.createElement("span")
   desc.className = "fcx-desc"
   desc.textContent = `: ${item.description || ""}`
 
   left.append(label, desc)
 
-  // Reset Button
   const reset = document.createElement("button")
   reset.className = "fcx-reset"
   reset.textContent = "Reset"
@@ -110,7 +104,6 @@ export const toggleConfigPanel = () => {
 }
 
 const openPanel = () => {
-  // Inject Styles if not present
   if (!document.getElementById("fcx-styles")) {
     const styleInfo = document.createElement("style")
     styleInfo.id = "fcx-styles"
@@ -125,12 +118,10 @@ const openPanel = () => {
   const panel = document.createElement("div")
   panel.id = "fcx-config-panel"
 
-  // 1. Header
   const header = document.createElement("div")
   header.id = "fcx-config-header"
   header.textContent = "Configuración FCX"
 
-  // 2. Content Area
   const content = document.createElement("div")
   content.id = "fcx-config-content"
 
@@ -158,21 +149,21 @@ const openPanel = () => {
     }
   })
 
-  // 3. Footer
   const footer = document.createElement("div")
   footer.id = "fcx-footer"
   const closeLink = document.createElement("a")
   closeLink.textContent = "Cerrar"
   closeLink.onclick = closePanel
 
-  // Global reset
   const resetLink = document.createElement("a")
   resetLink.textContent = "Restaurar todo"
   resetLink.onclick = () => {
     if (confirm("¿Restaurar toda la configuración?")) {
-      configs.forEach(c => resetConfig(c.key, c.defaultValue))
+      configs.forEach(c => {
+        resetConfig(c.key, c.defaultValue)
+      })
       closePanel()
-      openPanel() // Re-render
+      openPanel()
     }
   }
   footer.append(resetLink, document.createTextNode(" | "), closeLink)
@@ -180,7 +171,6 @@ const openPanel = () => {
   panel.append(header, content, footer)
   document.body.append(backdrop, panel)
 
-  // Animate In
   requestAnimationFrame(() => {
     backdrop.style.opacity = "1"
     panel.style.opacity = "1"

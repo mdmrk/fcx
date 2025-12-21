@@ -9,7 +9,7 @@ import type { SelectorConfig } from "@/types/adapter"
 export const watchFeed = (selectors: SelectorConfig): (() => void) => {
   if (!window.location.href.includes("showthread.php")) {
     if (devMode) console.log("Not a thread page, skipping feed watcher.")
-    return () => {}
+    return () => { }
   }
 
   const feed = document.querySelector<HTMLElement>(selectors.feedContainer)
@@ -23,7 +23,9 @@ export const watchFeed = (selectors: SelectorConfig): (() => void) => {
   if (devMode) console.log("Feed found, starting watcher...")
 
   const existing = feed.querySelectorAll<HTMLElement>(selectors.commentItem)
-  existing.forEach(el => styleComment(el, selectors))
+  existing.forEach(el => {
+    styleComment(el, selectors)
+  })
 
   const observer = new MutationObserver(mutations => {
     for (const mutation of mutations) {
@@ -35,7 +37,9 @@ export const watchFeed = (selectors: SelectorConfig): (() => void) => {
             const children = node.querySelectorAll<HTMLElement>(
               selectors.commentItem
             )
-            children.forEach(el => styleComment(el, selectors))
+            children.forEach(el => {
+              styleComment(el, selectors)
+            })
           }
         }
       }
