@@ -169,9 +169,9 @@ function generateHeader(
 
   const releaseHeader = releaseURL
     ? {
-        "@updateURL": releaseURL,
-        "@downloadURL": releaseURL,
-      }
+      "@updateURL": releaseURL,
+      "@downloadURL": releaseURL,
+    }
     : null
 
   const defaultHeader: MinimalUserScriptHeader = {
@@ -190,7 +190,7 @@ function generateHeader(
   for (const key in packageJson.userscriptHeader) {
     const value =
       packageJson.userscriptHeader[
-        key as keyof typeof packageJson.userscriptHeader
+      key as keyof typeof packageJson.userscriptHeader
       ]
     if (typeof key !== "string") {
       logger.warn(
@@ -400,11 +400,11 @@ function serve(option: ServerOption): Server {
   const { userscriptPath } = option
   const urlPath = `/${path.basename(userscriptPath)}`
   const server = Bun.serve({
-    static: {
-      "/": Response.redirect(urlPath),
-    },
     async fetch(req) {
       const url = new URL(req.url)
+      if (url.pathname === "/") {
+        return Response.redirect(urlPath)
+      }
       if (url.pathname === urlPath) {
         return new Response(Bun.file(userscriptPath))
       }

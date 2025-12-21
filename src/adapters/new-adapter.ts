@@ -27,7 +27,7 @@ export class NewSiteAdapter implements SiteAdapter {
     const sidebar = document.querySelector("#sidebar")
     if (sidebar) sidebar.remove()
 
-    const main = document.querySelector("main")
+    const main = document.querySelector<HTMLElement>("main")
     if (main) main.style.display = "block"
   }
 

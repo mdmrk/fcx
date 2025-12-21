@@ -64,14 +64,24 @@ const renderItem = (item: ConfigDefinition) => {
 
   const label = document.createElement("label")
   const input = document.createElement("input")
-  input.type = "checkbox"
+  if (item.type === "checkbox") {
+    input.type = "checkbox"
+    input.checked = getConfig(item.key, item.defaultValue as boolean)
+    input.onchange = e => {
+      setConfig(item.key, (e.target as HTMLInputElement).checked)
+    }
+  } else {
+    input.type = item.type
+    input.value = String(getConfig(item.key, item.defaultValue))
+    input.classList.add("fcx-input-text") // Add a class for potential styling
+    input.onchange = e => {
+      const val = (e.target as HTMLInputElement).value
+      setConfig(item.key, item.type === "number" ? Number(val) : val)
+    }
+  }
+
   input.style.marginRight = "5px"
   input.style.verticalAlign = "middle"
-  input.checked = getConfig(item.key, item.defaultValue)
-
-  input.onchange = e => {
-    setConfig(item.key, (e.target as HTMLInputElement).checked)
-  }
 
   label.append(input, item.label)
 
@@ -87,8 +97,11 @@ const renderItem = (item: ConfigDefinition) => {
   reset.title = "Restaurar valores predeterminados"
   reset.onclick = () => {
     resetConfig(item.key, item.defaultValue)
-    input.checked = item.defaultValue as boolean
-    setConfig(item.key, item.defaultValue)
+    if (item.type === "checkbox") {
+      input.checked = item.defaultValue as boolean
+    } else {
+      input.value = String(item.defaultValue)
+    }
   }
 
   div.append(left, reset)
