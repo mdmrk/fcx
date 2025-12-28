@@ -164,19 +164,19 @@ declare global {
   }
 
   /** 
-	 * Adds a change listener to the storage and returns the listener ID.
-	 * The name of the observed variable
-	 * @param name - string
-	 * 
-	 * The old value of the observed variable (undefined if it was created)
-	 * @param oldValue - any
+   * Adds a change listener to the storage and returns the listener ID.
+   * The name of the observed variable
+   * @param name - string
+   * 
+   * The old value of the observed variable (undefined if it was created)
+   * @param oldValue - any
  
-	 * The new value of the observed variable (undefined if it was deleted)
-	 * @param newValue - any
+   * The new value of the observed variable (undefined if it was deleted)
+   * @param newValue - any
  
-	 * true if modified by the userscript instance of another tab or false for this script instance. Can be used by scripts of different browser tabs to communicate with each other.
-	 * @param remote - boolean
-	*/
+   * true if modified by the userscript instance of another tab or false for this script instance. Can be used by scripts of different browser tabs to communicate with each other.
+   * @param remote - boolean
+  */
   declare function GM_addValueChangeListener<T extends JSONSerializable>(
     name: string,
     callback: (name: string, oldValue: T, newValue: T, remote: boolean) => void
@@ -186,4 +186,15 @@ declare global {
    * @param listenerId - string
    */
   declare function GM_removeValueChangeListener(listenerId: string): void
+  /**
+   * Register a menu to be displayed at the Tampermonkey menu.
+   * @param caption The menu item's caption.
+   * @param onClick The function to be called when the menu item is clicked.
+   * @param accessKey A keyboard shortcut for the menu item.
+   */
+  declare function GM_registerMenuCommand(
+    caption: string,
+    onClick: (mouseEvent: MouseEvent | KeyboardEvent) => void,
+    accessKey?: string
+  ): void
 }

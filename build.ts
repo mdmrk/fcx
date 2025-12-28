@@ -169,9 +169,9 @@ function generateHeader(
 
   const releaseHeader = releaseURL
     ? {
-      "@updateURL": releaseURL,
-      "@downloadURL": releaseURL,
-    }
+        "@updateURL": releaseURL,
+        "@downloadURL": releaseURL,
+      }
     : null
 
   const defaultHeader: MinimalUserScriptHeader = {
@@ -190,7 +190,7 @@ function generateHeader(
   for (const key in packageJson.userscriptHeader) {
     const value =
       packageJson.userscriptHeader[
-      key as keyof typeof packageJson.userscriptHeader
+        key as keyof typeof packageJson.userscriptHeader
       ]
     if (typeof key !== "string") {
       logger.warn(

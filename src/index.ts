@@ -26,28 +26,9 @@ import type { SiteAdapter } from "@/types/adapter"
   adapter.init()
   adapter.setupFeatures()
 
-  // Settings Button
-  const settingsBtn = document.createElement("button")
-  settingsBtn.textContent = "⚙️"
-  Object.assign(settingsBtn.style, {
-    position: "fixed",
-    bottom: "20px",
-    right: "20px",
-    zIndex: "9997",
-    padding: "8px 12px",
-    borderRadius: "50%",
-    backgroundColor: "#1e1e1e",
-    color: "#fff",
-    border: "1px solid #444",
-    cursor: "pointer",
-    fontSize: "20px",
-    boxShadow: "0 2px 10px rgba(0,0,0,0.3)",
-  })
-  settingsBtn.onclick = toggleConfigPanel
-  document.body.appendChild(settingsBtn)
+  GM_registerMenuCommand("Configuración", toggleConfigPanel)
 
   return () => {
     if (devMode) console.log("Script unloaded")
-    settingsBtn.remove()
   }
 })()

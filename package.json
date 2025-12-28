@@ -30,6 +30,8 @@
     "build:workflow": "bun build.ts --release-channel GitHubRelease",
     "build:greasyfork": "biome lint && tsc --noEmit && bun build.ts --release-channel OutOfBand",
     "clean": "rimraf ./dist/",
+    "format": "biome format --write .",
+    "lint": "biome lint .",
     "dev": "bun build.ts --dev --server --watch"
   },
   "type": "module",
@@ -43,7 +45,8 @@
     "@grant": [
       "GM_getValue",
       "GM_setValue",
-      "GM_addStyle"
+      "GM_addStyle",
+      "GM_registerMenuCommand"
     ],
     "@run-at": "document-end"
   }
