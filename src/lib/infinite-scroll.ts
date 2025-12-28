@@ -1,4 +1,4 @@
-import { devMode } from "@/config"
+import { logger } from "@/utils/logger"
 import type { SelectorConfig } from "@/types/adapter"
 import { currentPageType } from "@/utils/page-state"
 import { PageType } from "@/types/page-state"
@@ -11,7 +11,7 @@ export const initInfiniteScroll = (selectors: SelectorConfig) => {
   currentSelectors = selectors
 
   if (currentPageType !== PageType.THREAD) {
-    if (devMode) console.log("Infinite Scroll: Not a thread page.")
+    logger.log("Infinite Scroll: Not a thread page.")
     return
   }
 
@@ -20,12 +20,12 @@ export const initInfiniteScroll = (selectors: SelectorConfig) => {
   )
 
   if (!nextLink) {
-    if (devMode) console.log("Infinite Scroll: No next page found.")
+    logger.log("Infinite Scroll: No next page found.")
     return
   }
 
   nextUrl = nextLink.href
-  if (devMode) console.log("Infinite Scroll: Next page is", nextUrl)
+  logger.log("Infinite Scroll: Next page is", nextUrl)
 
   const sentry = document.createElement("div")
   sentry.id = "infinite-scroll-sentry"

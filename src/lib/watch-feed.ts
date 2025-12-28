@@ -1,4 +1,4 @@
-import { devMode } from "@/config"
+import { logger } from "@/utils/logger"
 import { styleComment } from "@/lib/style-comment"
 import type { SelectorConfig } from "@/types/adapter"
 
@@ -8,19 +8,19 @@ import type { SelectorConfig } from "@/types/adapter"
  */
 export const watchFeed = (selectors: SelectorConfig): (() => void) => {
   if (!window.location.href.includes("showthread.php")) {
-    if (devMode) console.log("Not a thread page, skipping feed watcher.")
+    logger.log("Not a thread page, skipping feed watcher.")
     return () => {}
   }
 
   const feed = document.querySelector<HTMLElement>(selectors.feedContainer)
 
   if (!feed) {
-    if (devMode) console.warn("Feed container not found, retrying in 1s...")
+    logger.warn("Feed container not found, retrying in 1s...")
     const timer = setTimeout(() => watchFeed(selectors), 1000)
     return () => clearTimeout(timer)
   }
 
-  if (devMode) console.log("Feed found, starting watcher...")
+  logger.log("Feed found, starting watcher...")
 
   const existing = feed.querySelectorAll<HTMLElement>(selectors.commentItem)
   existing.forEach(el => {
@@ -50,6 +50,6 @@ export const watchFeed = (selectors: SelectorConfig): (() => void) => {
 
   return () => {
     observer.disconnect()
-    if (devMode) console.log("Feed watcher stopped")
+    logger.log("Feed watcher stopped")
   }
 }
