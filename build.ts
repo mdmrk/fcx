@@ -102,11 +102,14 @@ const MINIMAL_USER_SCRIPT_HEADER_SET: Set<
 > = new Set(MINIMAL_USER_SCRIPT_HEADER_ITEMS)
 
 type MinimalUserScriptHeader = {
-  [K in (typeof MINIMAL_USER_SCRIPT_HEADER_ITEMS)[number]]: string[] | string
+  [K in (typeof MINIMAL_USER_SCRIPT_HEADER_ITEMS)[number]]:
+    | string[]
+    | string
+    | boolean
 }
 
 type UserScriptHeader = MinimalUserScriptHeader & {
-  [k: string]: string[] | string
+  [k: string]: string[] | string | boolean
 }
 
 // type ExtendedPackageJson = PackageJson & {
@@ -239,16 +242,19 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
   const outputPath = `${path.dirname(entrypointPath)}/${distUserScript}`
   const data = await Bun.file(entrypointPath).text()
   // Check the existence of GM apis in data and check if they are added in header["@grant"]
-  const grants = header["@grant"]
+  const grants = Array.isArray(header["@grant"])
+    ? (header["@grant"] as string[])
+    : []
+
   const usedApis = data.match(allGMApisMatcher)
   for (const api of usedApis ?? []) {
-    if (!grants?.includes(api)) {
+    if (!grants.includes(api)) {
       logger.error(
         `Used "${api}" api without permissions. Include it in package.json/userscriptHeader/@grant`
       )
     }
   }
-  for (const api of grants ?? []) {
+  for (const api of grants) {
     if (!usedApis?.includes(api)) {
       logger.warn(`Granted permission for "${api}" but never used`)
     }
@@ -257,8 +263,12 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
 
   for (const key of MINIMAL_USER_SCRIPT_HEADER_ITEMS) {
     const value = header[key]
-    for (const row of typeof value === "string" ? [value] : value) {
-      output += `// ${key.padEnd(longestHeaderChar)}  ${row}\n`
+    if (value === true) {
+      output += `// ${key}\n`
+    } else if (typeof value !== "boolean") {
+      for (const row of typeof value === "string" ? [value] : value) {
+        output += `// ${key.padEnd(longestHeaderChar)}  ${row}\n`
+      }
     }
   }
 
@@ -271,8 +281,13 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
       continue
     }
     const value = header[key]
-    for (const row of typeof value === "string" ? [value] : value) {
-      output += `// ${key.padEnd(longestHeaderChar)}  ${row}\n`
+
+    if (value === true) {
+      output += `// ${key}\n`
+    } else if (typeof value !== "boolean") {
+      for (const row of typeof value === "string" ? [value] : value) {
+        output += `// ${key.padEnd(longestHeaderChar)}  ${row}\n`
+      }
     }
   }
   output += HEADER_END
