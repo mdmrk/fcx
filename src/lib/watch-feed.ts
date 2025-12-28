@@ -8,7 +8,7 @@ import type { SelectorConfig } from "@/types/adapter"
  */
 export const watchFeed = (selectors: SelectorConfig): (() => void) => {
   if (!window.location.href.includes("showthread.php")) {
-    logger.log("Not a thread page, skipping feed watcher.")
+    logger.log("Watch Feed: Not a thread page.")
     return () => {}
   }
 
