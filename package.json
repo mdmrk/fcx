@@ -20,8 +20,8 @@
   "bugs": {
     "url": "https://github.com/mdmrk/fcx/issues"
   },
-  "description": "FCX",
-  "homepage": "https://github.com/webdevsk/fcx#readme",
+  "description": "Mejora la navegación en ForoCoches",
+  "homepage": "https://github.com/mdmrk/fcx#readme",
   "license": "GNU General Public License v3.0",
   "scripts": {
     "build": "bun build.ts",
