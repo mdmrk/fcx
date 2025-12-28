@@ -1,5 +1,7 @@
 import { devMode } from "@/config"
 import type { SelectorConfig } from "@/types/adapter"
+import { currentPageType } from "@/utils/page-state"
+import { PageType } from "@/types/page-state"
 
 let isLoading = false
 let nextUrl: string | null = null
@@ -7,6 +9,12 @@ let currentSelectors: SelectorConfig | null = null
 
 export const initInfiniteScroll = (selectors: SelectorConfig) => {
   currentSelectors = selectors
+
+  if (currentPageType !== PageType.THREAD) {
+    if (devMode) console.log("Infinite Scroll: Not a thread page.")
+    return
+  }
+
   const nextLink = document.querySelector<HTMLAnchorElement>(
     selectors.nextPageLink
   )
