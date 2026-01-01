@@ -1,0 +1,8 @@
+[B][SCRIPT] FCX: Scroll Infinito + Sin Publicidad + Diseño Limpio[/B]
+
+Os dejo este script para mejorar el floro. Tiene scroll infinito, quita la publi y limpia la interfaz.
+
+[B]Instalar:[/B] [URL]https://greasyfork.org/en/scripts/560544-fcx[/URL]
+[B]Código:[/B] [URL]https://github.com/mdmrk/fcx[/URL]
+
+A disfrutarlo shurs!

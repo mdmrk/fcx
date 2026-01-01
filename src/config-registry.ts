@@ -13,7 +13,7 @@ export const configs: ConfigDefinition[] = [
     label: "Eliminar Barra Lateral",
     description:
       "Elimina la barra lateral derecha y expande el área de contenido principal.",
-    defaultValue: true,
+    defaultValue: false,
     type: "checkbox",
   },
   {

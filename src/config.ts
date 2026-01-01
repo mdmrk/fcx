@@ -10,7 +10,6 @@ export const oldSelectors = {
   avatar: ".avatar",
   authorName: ".bigusername",
   content: "div[id^='post_message_']",
-
   nextPageLink: "a[rel='next']",
 }
 
