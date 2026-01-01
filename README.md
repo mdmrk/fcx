@@ -34,4 +34,8 @@ https://greasyfork.org/en/scripts/560544-fcx
     <td><b>Ajustes</b></td>
     <td>Menú para configurar el script.</td>
   </tr>
+  <tr>
+    <td><b>Compatibilidad</b></td>
+    <td>Versión nueva y antigua.</td>
+  </tr>
 </table>
