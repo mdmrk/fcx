@@ -11,6 +11,7 @@ export const oldSelectors = {
   authorName: ".bigusername",
   content: "div[id^='post_message_']",
   nextPageLink: "a[rel='next']",
+  prevPageLink: "a[rel='prev']",
 }
 
 export const newSelectors = {
@@ -20,4 +21,5 @@ export const newSelectors = {
   authorName: "div[id^='postmenu_'] > a",
   content: "div[id^='post_message_']",
   nextPageLink: "a:has(span[style*='--next-right-icon'])",
+  prevPageLink: "a:has(span[style*='--next-left-icon'])",
 }

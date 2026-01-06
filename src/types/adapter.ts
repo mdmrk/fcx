@@ -5,6 +5,7 @@ export interface SelectorConfig {
   authorName: string
   content: string
   nextPageLink: string
+  prevPageLink: string
 }
 
 export interface SiteAdapter {

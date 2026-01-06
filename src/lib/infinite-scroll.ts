@@ -5,6 +5,7 @@ import { PageType } from "@/types/page-state"
 
 let isLoading = false
 let nextUrl: string | null = null
+let prevUrl: string | null = null
 let currentSelectors: SelectorConfig | null = null
 
 export const initInfiniteScroll = (selectors: SelectorConfig) => {
@@ -15,39 +16,113 @@ export const initInfiniteScroll = (selectors: SelectorConfig) => {
     return
   }
 
+  const prevLink = document.querySelector<HTMLAnchorElement>(
+    selectors.prevPageLink
+  )
+
+  if (prevLink) {
+    prevUrl = prevLink.href
+    logger.log("Infinite Scroll: Prev page is", prevUrl)
+
+    const topSentry = document.createElement("div")
+    topSentry.id = "infinite-scroll-top-sentry"
+    topSentry.innerHTML =
+      "<p style='color: #666; font-weight: bold;'>Cargando página anterior...</p>"
+    topSentry.style.textAlign = "center"
+    topSentry.style.padding = "40px"
+
+    const feed = document.querySelector(selectors.feedContainer)
+    if (feed) feed.before(topSentry)
+
+    const topObserver = new IntersectionObserver(
+      entries => {
+        const entry = entries[0]
+        if (entry.isIntersecting && !isLoading && prevUrl) {
+          loadPrevPage()
+        }
+      },
+      { rootMargin: "300px" }
+    )
+
+    topObserver.observe(topSentry)
+  }
+
   const nextLink = document.querySelector<HTMLAnchorElement>(
     selectors.nextPageLink
   )
 
   if (!nextLink) {
     logger.log("Infinite Scroll: No next page found.")
-    return
+  } else {
+    nextUrl = nextLink.href
+    logger.log("Infinite Scroll: Next page is", nextUrl)
+
+    const bottomSentry = document.createElement("div")
+    bottomSentry.id = "infinite-scroll-bottom-sentry"
+    bottomSentry.innerHTML =
+      "<p style='color: #666; font-weight: bold;'>Cargando página siguiente...</p>"
+    bottomSentry.style.textAlign = "center"
+    bottomSentry.style.padding = "40px"
+
+    const feed = document.querySelector(selectors.feedContainer)
+    if (feed) feed.after(bottomSentry)
+
+    const bottomObserver = new IntersectionObserver(
+      entries => {
+        const entry = entries[0]
+        if (entry.isIntersecting && !isLoading && nextUrl) {
+          loadNextPage()
+        }
+      },
+      { rootMargin: "300px" }
+    )
+
+    bottomObserver.observe(bottomSentry)
   }
+}
 
-  nextUrl = nextLink.href
-  logger.log("Infinite Scroll: Next page is", nextUrl)
+const loadPrevPage = async () => {
+  if (!prevUrl) return
+  isLoading = true
 
-  const sentry = document.createElement("div")
-  sentry.id = "infinite-scroll-sentry"
-  sentry.innerHTML =
-    "<p style='color: #666; font-weight: bold;'>Loading next page...</p>"
-  sentry.style.textAlign = "center"
-  sentry.style.padding = "40px"
+  try {
+    const response = await fetch(prevUrl)
+    const text = await response.text()
+    const parser = new DOMParser()
+    const doc = parser.parseFromString(text, "text/html")
+    const newFeed = doc.querySelector(currentSelectors!.feedContainer)
+    const currentFeed = document.querySelector(currentSelectors!.feedContainer)
 
-  const feed = document.querySelector(selectors.feedContainer)
-  if (feed) feed.after(sentry)
+    if (newFeed && currentFeed) {
+      const oldScrollHeight = document.documentElement.scrollHeight
+      const oldScrollTop = document.documentElement.scrollTop
 
-  const observer = new IntersectionObserver(
-    entries => {
-      const entry = entries[0]
-      if (entry.isIntersecting && !isLoading && nextUrl) {
-        loadNextPage()
-      }
-    },
-    { rootMargin: "300px" }
-  )
+      Array.from(newFeed.children)
+        .reverse()
+        .forEach(child => {
+          const importedNode = document.importNode(child, true)
+          currentFeed.insertBefore(importedNode, currentFeed.firstChild)
+        })
 
-  observer.observe(sentry)
+      const newScrollHeight = document.documentElement.scrollHeight
+      document.documentElement.scrollTop =
+        oldScrollTop + (newScrollHeight - oldScrollHeight)
+    }
+
+    const prevLink = doc.querySelector<HTMLAnchorElement>(
+      currentSelectors!.prevPageLink
+    )
+    if (prevLink) {
+      prevUrl = prevLink.href
+    } else {
+      prevUrl = null
+      document.querySelector("#infinite-scroll-top-sentry")?.remove()
+    }
+  } catch (err) {
+    console.error("Infinite Scroll (Prev) Error:", err)
+  } finally {
+    isLoading = false
+  }
 }
 
 const loadNextPage = async () => {
@@ -82,7 +157,7 @@ const loadNextPage = async () => {
       nextUrl = nextLink.href
     } else {
       nextUrl = null
-      document.querySelector("#infinite-scroll-sentry")?.remove()
+      document.querySelector("#infinite-scroll-bottom-sentry")?.remove()
     }
   } catch (err) {
     console.error("Infinite Scroll Error:", err)
