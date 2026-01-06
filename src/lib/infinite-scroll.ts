@@ -81,6 +81,44 @@ export const initInfiniteScroll = (selectors: SelectorConfig) => {
   }
 }
 
+const getPageNumber = (url: string): string | null => {
+  try {
+    const urlObj = new URL(url)
+    const params = new URLSearchParams(urlObj.search)
+    return params.get("page")
+  } catch (e) {
+    console.error("Error parsing URL for page number", e)
+    return null
+  }
+}
+
+const getPageNumberFromDoc = (doc: Document): string | null => {
+  if (currentSelectors?.activePage) {
+    const activePageEl = doc.querySelector(currentSelectors.activePage)
+    if (activePageEl?.textContent) {
+      return activePageEl.textContent.trim()
+    }
+  }
+  return null
+}
+
+const createSeparator = (pageNumber: string) => {
+  const div = document.createElement("div")
+  div.classList.add("infinite-scroll-separator")
+
+  const line = document.createElement("div")
+  line.classList.add("infinite-scroll-separator-line")
+
+  const span = document.createElement("span")
+  span.textContent = `Página ${pageNumber}`
+  span.classList.add("infinite-scroll-separator-text")
+
+  div.appendChild(line)
+  div.appendChild(span)
+
+  return div
+}
+
 const loadPrevPage = async () => {
   if (!prevUrl) return
   isLoading = true
@@ -103,6 +141,12 @@ const loadPrevPage = async () => {
           const importedNode = document.importNode(child, true)
           currentFeed.insertBefore(importedNode, currentFeed.firstChild)
         })
+
+      const pageNum = getPageNumberFromDoc(doc) || getPageNumber(prevUrl!)
+      if (pageNum) {
+        const separator = createSeparator(pageNum)
+        currentFeed.insertBefore(separator, currentFeed.firstChild)
+      }
 
       const newScrollHeight = document.documentElement.scrollHeight
       document.documentElement.scrollTop =
@@ -138,11 +182,11 @@ const loadNextPage = async () => {
     const currentFeed = document.querySelector(currentSelectors!.feedContainer)
 
     if (newFeed && currentFeed) {
-      // const divider = document.createElement("div")
-      // divider.innerHTML = `<span style="background:#eee; padding: 5px 10px; border-radius: 4px;"> ${nextUrl}</span>`
-      // divider.style.textAlign = "center"
-      // divider.style.margin = "20px 0"
-      // currentFeed.appendChild(divider)
+      const pageNum = getPageNumberFromDoc(doc) || getPageNumber(nextUrl!)
+      if (pageNum) {
+        const separator = createSeparator(pageNum)
+        currentFeed.appendChild(separator)
+      }
 
       Array.from(newFeed.children).forEach(child => {
         const importedNode = document.importNode(child, true)

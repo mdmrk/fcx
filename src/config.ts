@@ -12,6 +12,7 @@ export const oldSelectors = {
   content: "div[id^='post_message_']",
   nextPageLink: "a[rel='next']",
   prevPageLink: "a[rel='prev']",
+  activePage: "td.alt2 .mfont strong",
 }
 
 export const newSelectors = {
@@ -22,4 +23,5 @@ export const newSelectors = {
   content: "div[id^='post_message_']",
   nextPageLink: "a:has(span[style*='--next-right-icon'])",
   prevPageLink: "a:has(span[style*='--next-left-icon'])",
+  activePage: "span[title*='Mostrando resultados'] > strong",
 }

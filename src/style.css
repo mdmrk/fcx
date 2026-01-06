@@ -7,3 +7,31 @@
   /* padding: 15px; */
   /* margin-bottom: 10px; */
 }
+
+.infinite-scroll-separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 20px 0;
+  position: relative;
+}
+
+.infinite-scroll-separator-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background-color: var(--border-color, #e5e7eb);
+  z-index: 1;
+}
+
+.infinite-scroll-separator-text {
+  background-color: var(--bg-color, #fff);
+  color: var(--text-secondary, #6b7280);
+  padding: 0 16px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  z-index: 2;
+  border-radius: 9999px;
+  border: 1px solid var(--border-color, #e5e7eb);
+}

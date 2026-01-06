@@ -6,6 +6,7 @@ export interface SelectorConfig {
   content: string
   nextPageLink: string
   prevPageLink: string
+  activePage?: string
 }
 
 export interface SiteAdapter {
