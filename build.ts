@@ -339,6 +339,10 @@ async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
       plugins: [styleLoader()],
       target: "browser",
       format: "esm",
+      define: {
+        __DEV__: JSON.stringify(dev),
+        __dev__: JSON.stringify(dev),
+      },
     })
     logger.info(Bun.inspect(build, { colors: true }))
 

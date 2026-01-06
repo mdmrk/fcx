@@ -1,4 +1,4 @@
-export const devMode = true
+export const devMode = __DEV__
 
 export const theme = {
   enhancedCommentClass: "enhanced-comment",
