@@ -1,8 +1,8 @@
 import { CONFIG_KEYS } from "@/config-registry"
-import { getConfig } from "@/utils/storage"
+import { getEffectiveConfig } from "@/utils/storage"
 
-export const removeBanners = () => {
-  const shouldRemove = getConfig(CONFIG_KEYS.REMOVE_BANNERS, true)
+export const removeBanners = (scope: "new" | "old") => {
+  const shouldRemove = getEffectiveConfig(CONFIG_KEYS.REMOVE_BANNERS, scope)
   if (!shouldRemove) return
   const banner = document.getElementById("notices-wrapper")
   if (banner) {

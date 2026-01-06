@@ -4,6 +4,8 @@ import { watchFeed } from "@/lib/watch-feed"
 import { initInfiniteScroll } from "@/lib/infinite-scroll"
 import { logger } from "@/utils/logger"
 import { removeBanners } from "@/lib/remove-banners"
+import { CONFIG_KEYS } from "@/config-registry"
+import { getEffectiveConfig } from "@/utils/storage"
 
 export class OldSiteAdapter implements SiteAdapter {
   name = "Old Interface"
@@ -15,11 +17,13 @@ export class OldSiteAdapter implements SiteAdapter {
 
   init() {
     logger.log(`Initializing ${this.name} adapter...`)
-    removeBanners()
+    removeBanners("old")
   }
 
   setupFeatures() {
     watchFeed(this.selectors)
-    initInfiniteScroll(this.selectors)
+    if (getEffectiveConfig(CONFIG_KEYS.INFINITE_SCROLL, "old")) {
+      initInfiniteScroll(this.selectors)
+    }
   }
 }

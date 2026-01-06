@@ -1,111 +1,84 @@
 import { configs } from "@/config-registry"
-import { ConfigSection, type ConfigDefinition } from "@/types/config"
-import { getConfig, setConfig, resetConfig } from "@/utils/storage"
+import type { ConfigDefinition } from "@/types/config"
+import {
+  getConfig,
+  setConfig,
+  resetConfig,
+  getScopedConfigKey,
+} from "@/utils/storage"
 
-const STYLES = `
-#fcx-config-backdrop {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.5); z-index: 9998;
-}
-#fcx-config-panel {
-    position: fixed; top: 50%; left: 50%; width: 1000px; max-width: 95%; max-height: 90vh;
-    transform: translate(-50%, -50%) scale(0.95);
-    background: #1e1e1e; color: #ccc; border-radius: 4px;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.5); z-index: 9999;
-    opacity: 0;
-    display: flex; flex-direction: column; font-size: 13px;
-    border: 1px solid #444;
-}
-#fcx-config-header {
-    background: linear-gradient(to bottom, #2a2a2a, #1a1a1a);
-    padding: 8px 10px; border-bottom: 1px solid #000;
-    font-weight: bold; color: #fff;
-}
-
-#fcx-config-content {
-    flex: 1; overflow-y: auto; padding: 10px;
-}
-fieldset.fcx-group {
-    border: 1px solid #444; margin: 0 0 10px 0; padding: 5px 10px;
-}
-fieldset.fcx-group legend {
-    color: #fe5e00; font-weight: bold; padding: 0 4px;
-}
-.fcx-item {
-    margin-bottom: 2px; display: flex; align-items: center; justify-content: space-between;
-}
-.fcx-item label {
-    cursor: pointer; color: #eee;
-}
-.fcx-item label:hover { color: #fff; }
-.fcx-desc {
-    color: #888; margin-left: 4px;
-}
-.fcx-reset {
-    background: transparent; border: none; color: #666; cursor: pointer;
-    font-size: 10px; padding: 0 4px; margin-left: auto;
-}
-.fcx-reset:hover { color: #fe5e00; }
-#fcx-footer {
-    border-top: 1px solid #333; padding: 5px 10px;
-    background: #1a1a1a; text-align: right;
-    font-size: 11px; color: #666;
-}
-#fcx-footer a { color: #888; text-decoration: none; margin-left: 10px; cursor: pointer; }
-#fcx-footer a:hover { color: #ccc; }
-`
-
-const renderItem = (item: ConfigDefinition) => {
-  const div = document.createElement("div")
-  div.className = "fcx-item"
-  div.dataset.name = item.label
-
-  const left = document.createElement("div")
-
-  const label = document.createElement("label")
+const createCheckbox = (checked: boolean, onChange: (val: boolean) => void) => {
   const input = document.createElement("input")
-  if (item.type === "checkbox") {
-    input.type = "checkbox"
-    input.checked = getConfig(item.key, item.defaultValue as boolean)
-    input.onchange = e => {
-      setConfig(item.key, (e.target as HTMLInputElement).checked)
-    }
-  } else {
-    input.type = item.type
-    input.value = String(getConfig(item.key, item.defaultValue))
-    input.classList.add("fcx-input-text") // Add a class for potential styling
-    input.onchange = e => {
-      const val = (e.target as HTMLInputElement).value
-      setConfig(item.key, item.type === "number" ? Number(val) : val)
-    }
+  input.type = "checkbox"
+  input.checked = checked
+  input.onchange = e => {
+    onChange((e.target as HTMLInputElement).checked)
   }
+  return input
+}
 
-  input.style.marginRight = "5px"
-  input.style.verticalAlign = "middle"
+const renderRow = (item: ConfigDefinition) => {
+  const tr = document.createElement("tr")
 
-  label.append(input, item.label)
-
+  // Name Column
+  const tdName = document.createElement("td")
+  const label = document.createElement("div")
+  label.className = "fcx-label"
+  label.textContent = item.label
   const desc = document.createElement("span")
   desc.className = "fcx-desc"
-  desc.textContent = `: ${item.description || ""}`
+  desc.textContent = item.description
+  tdName.append(label, desc)
 
-  left.append(label, desc)
+  // General Column
+  const tdGeneral = document.createElement("td")
+  tdGeneral.className = "fcx-col-chk"
+  const generalChecked = getConfig(item.key, item.defaultValue as boolean)
 
-  const reset = document.createElement("button")
-  reset.className = "fcx-reset"
-  reset.textContent = "Reset"
-  reset.title = "Restaurar valores predeterminados"
-  reset.onclick = () => {
-    resetConfig(item.key, item.defaultValue)
-    if (item.type === "checkbox") {
-      input.checked = item.defaultValue as boolean
+  const updateRowState = (isGeneralChecked: boolean) => {
+    if (isGeneralChecked) {
+      tdNew.classList.add("fcx-disabled")
+      tdOld.classList.add("fcx-disabled")
     } else {
-      input.value = String(item.defaultValue)
+      tdNew.classList.remove("fcx-disabled")
+      tdOld.classList.remove("fcx-disabled")
     }
   }
 
-  div.append(left, reset)
-  return div
+  const checkGeneral = createCheckbox(generalChecked, val => {
+    setConfig(item.key, val)
+    updateRowState(val)
+  })
+  tdGeneral.append(checkGeneral)
+
+  // New Column
+  const tdNew = document.createElement("td")
+  tdNew.className = "fcx-col-chk"
+  if (!item.scopes || item.scopes.includes("new")) {
+    const keyNew = getScopedConfigKey(item.key, "new")
+    const checkNew = createCheckbox(
+      getConfig(keyNew, false as boolean), // Default false for overrides
+      val => setConfig(keyNew, val)
+    )
+    tdNew.append(checkNew)
+  }
+
+  // Old Column
+  const tdOld = document.createElement("td")
+  tdOld.className = "fcx-col-chk"
+  if (!item.scopes || item.scopes.includes("old")) {
+    const keyOld = getScopedConfigKey(item.key, "old")
+    const checkOld = createCheckbox(
+      getConfig(keyOld, false as boolean), // Default false for overrides
+      val => setConfig(keyOld, val)
+    )
+    tdOld.append(checkOld)
+  }
+
+  updateRowState(generalChecked)
+
+  tr.append(tdName, tdGeneral, tdNew, tdOld)
+  return tr
 }
 
 export const toggleConfigPanel = () => {
@@ -117,13 +90,6 @@ export const toggleConfigPanel = () => {
 }
 
 const openPanel = () => {
-  if (!document.getElementById("fcx-styles")) {
-    const styleInfo = document.createElement("style")
-    styleInfo.id = "fcx-styles"
-    styleInfo.textContent = STYLES
-    document.head.append(styleInfo)
-  }
-
   const backdrop = document.createElement("div")
   backdrop.id = "fcx-config-backdrop"
   backdrop.onclick = closePanel
@@ -138,29 +104,36 @@ const openPanel = () => {
   const content = document.createElement("div")
   content.id = "fcx-config-content"
 
-  const sections = Object.values(ConfigSection)
+  const table = document.createElement("table")
+  table.id = "fcx-config-table"
 
-  sections.forEach(sec => {
-    const currentItems = configs.filter(c => c.section === sec)
-    if (currentItems.length > 0) {
-      const fieldset = document.createElement("fieldset")
-      fieldset.className = "fcx-group"
-      const legend = document.createElement("legend")
-      legend.textContent = sec
-      fieldset.append(legend)
+  const thead = document.createElement("thead")
+  const trHead = document.createElement("tr")
+  const thName = document.createElement("th")
+  thName.className = "fcx-col-opt"
+  thName.textContent = "Opción"
+  const thGen = document.createElement("th")
+  thGen.className = "fcx-col-chk"
+  thGen.textContent = "General"
+  const thNew = document.createElement("th")
+  thNew.className = "fcx-col-chk"
+  thNew.textContent = "Nuevo"
+  const thOld = document.createElement("th")
+  thOld.className = "fcx-col-chk"
+  thOld.textContent = "Antiguo"
 
-      currentItems.forEach(item => {
-        fieldset.append(renderItem(item))
-      })
-      content.append(fieldset)
-    } else {
-      const msg = document.createElement("div")
-      msg.style.padding = "20px"
-      msg.style.color = "#666"
-      msg.textContent = "No hay opciones en esta sección aún."
-      content.append(msg)
+  trHead.append(thName, thGen, thNew, thOld)
+  thead.append(trHead)
+  table.append(thead)
+
+  const tbody = document.createElement("tbody")
+  configs.forEach(item => {
+    if (item.type === "checkbox") {
+      tbody.append(renderRow(item))
     }
   })
+  table.append(tbody)
+  content.append(table)
 
   const footer = document.createElement("div")
   footer.id = "fcx-footer"
@@ -174,6 +147,12 @@ const openPanel = () => {
     if (confirm("¿Restaurar toda la configuración?")) {
       configs.forEach(c => {
         resetConfig(c.key, c.defaultValue)
+        if (!c.scopes || c.scopes.includes("new")) {
+          resetConfig(getScopedConfigKey(c.key, "new"), false)
+        }
+        if (!c.scopes || c.scopes.includes("old")) {
+          resetConfig(getScopedConfigKey(c.key, "old"), false)
+        }
       })
       closePanel()
       openPanel()

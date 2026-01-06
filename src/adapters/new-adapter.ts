@@ -3,7 +3,7 @@ import { watchFeed } from "@/lib/watch-feed"
 import { initInfiniteScroll } from "@/lib/infinite-scroll"
 import { newSelectors } from "@/config"
 import { logger } from "@/utils/logger"
-import { getConfig } from "@/utils/storage"
+import { getEffectiveConfig } from "@/utils/storage"
 import { CONFIG_KEYS } from "@/config-registry"
 import { removeBanners } from "@/lib/remove-banners"
 
@@ -18,11 +18,11 @@ export class NewSiteAdapter implements SiteAdapter {
   init() {
     logger.log(`Initializing ${this.name} adapter...`)
     this.removeSidebar()
-    removeBanners()
+    removeBanners("new")
   }
 
   private removeSidebar() {
-    const shouldRemove = getConfig(CONFIG_KEYS.REMOVE_SIDEBAR, true)
+    const shouldRemove = getEffectiveConfig(CONFIG_KEYS.REMOVE_SIDEBAR, "new")
     if (!shouldRemove) return
 
     const sidebar = document.querySelector("#sidebar")
@@ -34,7 +34,7 @@ export class NewSiteAdapter implements SiteAdapter {
 
   setupFeatures() {
     watchFeed(this.selectors)
-    if (getConfig(CONFIG_KEYS.INFINITE_SCROLL, true)) {
+    if (getEffectiveConfig(CONFIG_KEYS.INFINITE_SCROLL, "new")) {
       initInfiniteScroll(this.selectors)
     }
   }

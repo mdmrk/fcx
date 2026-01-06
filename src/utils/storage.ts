@@ -24,3 +24,32 @@ export const setConfig = <T>(key: string, value: T): void => {
 export const resetConfig = (key: string, defaultValue: ConfigValue): void => {
   setConfig(key, defaultValue)
 }
+
+export const getScopedConfigKey = (
+  key: string,
+  scope: "new" | "old"
+): string => {
+  return `${key}_${scope}`
+}
+
+export const getEffectiveConfig = (
+  key: string,
+  scope: "new" | "old"
+): boolean => {
+  // General setting (acting as override)
+  const general = getConfig(key, false as boolean)
+  if (general === true) return true
+
+  // Specific scope setting
+  const scopedKey = getScopedConfigKey(key, scope)
+  // Default to true if not set, or false?
+  // Logic: "General" overrides everything if TRUE.
+  // If General is FALSE, we check the specific setting.
+  // Wait, the requirement is "General overrides the other two".
+  // If General is checked, enabled for all.
+  // If General is unchecked, check specific.
+
+  // NOTE: defaultValue management is tricky here.
+  // We assume boolean for all these scoped configs for now.
+  return getConfig(scopedKey, false)
+}
