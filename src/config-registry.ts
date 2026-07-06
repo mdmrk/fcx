@@ -4,6 +4,7 @@ export const CONFIG_KEYS = {
   REMOVE_SIDEBAR: "remove_sidebar",
   INFINITE_SCROLL: "infinite_scroll",
   REMOVE_BANNERS: "remove_banners",
+  MAX_EAGER_PAGES: "max_eager_pages",
 }
 
 export const configs: ConfigDefinition[] = [
@@ -18,11 +19,21 @@ export const configs: ConfigDefinition[] = [
   },
   {
     key: CONFIG_KEYS.INFINITE_SCROLL,
-    label: "Scroll Infinito",
+    label: "Cargar hilo completo",
     description:
-      "Carga automáticamente la siguiente página de hilos al llegar al final.",
+      "Carga el hilo entero al entrar (hasta 50 páginas); en hilos más largos carga las páginas automáticamente al hacer scroll.",
     defaultValue: true,
     type: "checkbox",
+  },
+  {
+    key: CONFIG_KEYS.MAX_EAGER_PAGES,
+    label: "Máx. páginas al cargar de golpe",
+    description:
+      "Al abrir un hilo, número máximo de páginas que se cargan de una vez; los hilos más largos siguen cargando al hacer scroll.",
+    defaultValue: 50,
+    type: "number",
+    min: 1,
+    max: 500,
   },
   {
     key: CONFIG_KEYS.REMOVE_BANNERS,

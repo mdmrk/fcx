@@ -33,7 +33,8 @@
     "clean": "rimraf ./dist/",
     "format": "biome format --write .",
     "lint": "biome lint .",
-    "dev": "tsx build.ts --dev --server --watch"
+    "dev": "tsx build.ts --dev --server --watch",
+    "dev:hot": "bash scripts/dev-hot.sh"
   },
   "type": "module",
   "userscriptHeader": {

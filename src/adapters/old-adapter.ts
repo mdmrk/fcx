@@ -1,6 +1,6 @@
 import type { SiteAdapter, SelectorConfig } from "@/types/adapter"
 import { oldSelectors } from "@/config"
-import { initInfiniteScroll } from "@/lib/infinite-scroll"
+import { initThreadLoader } from "@/lib/thread-loader"
 import { logger } from "@/utils/logger"
 import { removeBanners } from "@/lib/remove-banners"
 import { CONFIG_KEYS } from "@/config-registry"
@@ -21,7 +21,7 @@ export class OldSiteAdapter implements SiteAdapter {
 
   setupFeatures() {
     if (getEffectiveConfig(CONFIG_KEYS.INFINITE_SCROLL, "old")) {
-      initInfiniteScroll(this.selectors)
+      initThreadLoader(this.selectors)
     }
   }
 }

@@ -10,6 +10,7 @@
 //   node scripts/cdp.mjs sel '<css>' [match]  test a selector: count + samples
 //   node scripts/cdp.mjs eval '<js>' [match]  evaluate JS in the page, print result
 //   node scripts/cdp.mjs inject [urlMatch]    inject dist/fcx.user.js (with GM shims)
+//   node scripts/cdp.mjs watch  [urlMatch]    hot reload: on each rebuild, reload tab + reinject
 //
 // `urlMatch` picks the tab whose URL contains that substring (default: first
 // forocoches tab, else the first page tab).
@@ -66,6 +67,46 @@ function evaluate(wsUrl, expression) {
   })
 }
 
+const sleep = ms => new Promise(r => setTimeout(r, ms))
+
+// Poll until the reloaded page has parsed the DOM (document-end equivalent).
+async function waitReady(wsUrl, tries = 60) {
+  for (let i = 0; i < tries; i++) {
+    try {
+      const s = await evaluate(wsUrl, "document.readyState")
+      if (s === "interactive" || s === "complete") return
+    } catch {}
+    await sleep(250)
+  }
+}
+
+// The injectable payload: the bundle minus its userscript header, prefixed with
+// shims for the GM APIs it uses so it runs without a userscript manager.
+async function buildInjection() {
+  const { readFile } = await import("node:fs/promises")
+  const raw = await readFile("./dist/fcx.user.js", "utf8")
+  const body = raw.replace(/^\/\/ ==UserScript==[\s\S]*?==\/UserScript==\n/, "")
+  const shims = `
+    window.GM_addStyle = window.GM_addStyle || (css => {
+      const s = document.createElement("style");
+      s.textContent = css; document.head.appendChild(s); return s;
+    });
+    window.GM_getValue = window.GM_getValue || ((k, d) => {
+      const v = localStorage.getItem("fcx_" + k);
+      return v === null ? d : JSON.parse(v);
+    });
+    window.GM_setValue = window.GM_setValue || ((k, v) =>
+      localStorage.setItem("fcx_" + k, JSON.stringify(v)));
+    window.GM_registerMenuCommand = window.GM_registerMenuCommand ||
+      ((c, fn) => { window.__fcxMenu = fn; console.log("[FCX] menu:", c); });
+  `
+  return `${shims}\n${body}\ntrue`
+}
+
+async function injectInto(t) {
+  await evaluate(t.webSocketDebuggerUrl, await buildInjection())
+}
+
 const [cmd, arg1, arg2] = process.argv.slice(2)
 
 if (cmd === "tabs") {
@@ -108,34 +149,48 @@ if (cmd === "html") {
     process.exit(1)
   }
   const t = pickTarget(pages, arg2)
-  const val = await evaluate(t.webSocketDebuggerUrl, `(() => (${arg1}))()`)
+  // Passed straight to Runtime.evaluate: an expression returns its value, and a
+  // statement list returns the completion value of its last expression.
+  const val = await evaluate(t.webSocketDebuggerUrl, arg1)
   console.log(typeof val === "string" ? val : JSON.stringify(val, null, 2))
 } else if (cmd === "inject") {
-  const { readFile } = await import("node:fs/promises")
   const t = pickTarget(pages, arg1)
-  const raw = await readFile("./dist/fcx.user.js", "utf8")
-  const body = raw.replace(/^\/\/ ==UserScript==[\s\S]*?==\/UserScript==\n/, "")
-  // Shim the GM APIs the script uses so it runs outside a userscript manager.
-  const shims = `
-    window.GM_addStyle = window.GM_addStyle || (css => {
-      const s = document.createElement("style");
-      s.textContent = css; document.head.appendChild(s); return s;
-    });
-    window.GM_getValue = window.GM_getValue || ((k, d) => {
-      const v = localStorage.getItem("fcx_" + k);
-      return v === null ? d : JSON.parse(v);
-    });
-    window.GM_setValue = window.GM_setValue || ((k, v) =>
-      localStorage.setItem("fcx_" + k, JSON.stringify(v)));
-    window.GM_registerMenuCommand = window.GM_registerMenuCommand ||
-      ((c, fn) => { window.__fcxMenu = fn; console.log("[FCX] menu:", c); });
-  `
-  await evaluate(t.webSocketDebuggerUrl, `${shims}\n${body}\ntrue`)
+  await injectInto(t)
   console.log(`Injected FCX into ${t.url}`)
   console.log("Open the config panel with: node scripts/cdp.mjs eval '__fcxMenu()'")
+} else if (cmd === "watch") {
+  const match = arg1
+  const { watch } = await import("node:fs")
+
+  // Enable infinite scroll for this dev profile so the feature actually runs.
+  await evaluate(
+    pickTarget(pages, match).webSocketDebuggerUrl,
+    'localStorage.setItem("fcx_infinite_scroll", "true")'
+  ).catch(() => {})
+
+  const reloadAndInject = async () => {
+    try {
+      const t = pickTarget(await listTargets(), match)
+      await evaluate(t.webSocketDebuggerUrl, "location.reload()").catch(() => {})
+      await sleep(400)
+      await waitReady(t.webSocketDebuggerUrl)
+      await injectInto(t)
+      console.log(`${new Date().toLocaleTimeString()}  reloaded + injected → ${t.url}`)
+    } catch (e) {
+      console.error("reload failed:", e.message)
+    }
+  }
+
+  await reloadAndInject()
+  let timer
+  watch("./dist/fcx.user.js", () => {
+    clearTimeout(timer)
+    timer = setTimeout(reloadAndInject, 200)
+  })
+  console.log("Watching dist/fcx.user.js — edit src/ and the tab reloads. Ctrl-C to stop.")
 } else {
   console.error(
-    "commands: tabs | html [match] | sel '<css>' [match] | eval '<js>' [match] | inject [match]"
+    "commands: tabs | html [match] | sel '<css>' [match] | eval '<js>' [match] | inject [match] | watch [match]"
   )
   process.exit(1)
 }

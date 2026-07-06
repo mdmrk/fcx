@@ -17,6 +17,63 @@ const createCheckbox = (checked: boolean, onChange: (val: boolean) => void) => {
   return input
 }
 
+const createNumberInput = (
+  value: number,
+  min: number | undefined,
+  max: number | undefined,
+  onChange: (val: number) => void
+) => {
+  const input = document.createElement("input")
+  input.type = "number"
+  input.className = "fcx-number"
+  input.value = String(value)
+  if (min !== undefined) input.min = String(min)
+  if (max !== undefined) input.max = String(max)
+  input.onchange = e => {
+    const raw = Number((e.target as HTMLInputElement).value)
+    let v = Number.isFinite(raw) ? Math.round(raw) : value
+    if (min !== undefined) v = Math.max(min, v)
+    if (max !== undefined) v = Math.min(max, v)
+    input.value = String(v)
+    onChange(v)
+  }
+  return input
+}
+
+// A global numeric setting: value lives in the "General" column; the per-interface
+// columns don't apply.
+const renderNumberRow = (item: ConfigDefinition) => {
+  const tr = document.createElement("tr")
+
+  const tdName = document.createElement("td")
+  const label = document.createElement("div")
+  label.className = "fcx-label"
+  label.textContent = item.label
+  const desc = document.createElement("span")
+  desc.className = "fcx-desc"
+  desc.textContent = item.description
+  tdName.append(label, desc)
+
+  const tdValue = document.createElement("td")
+  tdValue.className = "fcx-col-chk"
+  tdValue.append(
+    createNumberInput(
+      getConfig(item.key, item.defaultValue as number),
+      item.min,
+      item.max,
+      val => setConfig(item.key, val)
+    )
+  )
+
+  const tdNew = document.createElement("td")
+  tdNew.className = "fcx-col-chk"
+  const tdOld = document.createElement("td")
+  tdOld.className = "fcx-col-chk"
+
+  tr.append(tdName, tdValue, tdNew, tdOld)
+  return tr
+}
+
 const renderRow = (item: ConfigDefinition) => {
   const tr = document.createElement("tr")
 
@@ -130,6 +187,8 @@ const openPanel = () => {
   configs.forEach(item => {
     if (item.type === "checkbox") {
       tbody.append(renderRow(item))
+    } else if (item.type === "number") {
+      tbody.append(renderNumberRow(item))
     }
   })
   table.append(tbody)
@@ -147,6 +206,7 @@ const openPanel = () => {
     if (confirm("¿Restaurar toda la configuración?")) {
       configs.forEach(c => {
         resetConfig(c.key, c.defaultValue)
+        if (c.type !== "checkbox") return
         if (!c.scopes || c.scopes.includes("new")) {
           resetConfig(getScopedConfigKey(c.key, "new"), false)
         }

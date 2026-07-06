@@ -1,5 +1,5 @@
 import type { SiteAdapter, SelectorConfig } from "@/types/adapter"
-import { initInfiniteScroll } from "@/lib/infinite-scroll"
+import { initThreadLoader } from "@/lib/thread-loader"
 import { newSelectors } from "@/config"
 import { logger } from "@/utils/logger"
 import { getEffectiveConfig } from "@/utils/storage"
@@ -33,7 +33,7 @@ export class NewSiteAdapter implements SiteAdapter {
 
   setupFeatures() {
     if (getEffectiveConfig(CONFIG_KEYS.INFINITE_SCROLL, "new")) {
-      initInfiniteScroll(this.selectors)
+      initThreadLoader(this.selectors)
     }
   }
 }
