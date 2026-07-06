@@ -1,5 +1,4 @@
 import type { SiteAdapter, SelectorConfig } from "@/types/adapter"
-import { watchFeed } from "@/lib/watch-feed"
 import { initInfiniteScroll } from "@/lib/infinite-scroll"
 import { newSelectors } from "@/config"
 import { logger } from "@/utils/logger"
@@ -33,7 +32,6 @@ export class NewSiteAdapter implements SiteAdapter {
   }
 
   setupFeatures() {
-    watchFeed(this.selectors)
     if (getEffectiveConfig(CONFIG_KEYS.INFINITE_SCROLL, "new")) {
       initInfiniteScroll(this.selectors)
     }

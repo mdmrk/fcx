@@ -4,7 +4,8 @@ DO NOT work on the code from GreasyFork. It is built code. Work on this reposito
 
 ## Prerequisites
 
-- [Bun](https://bun.sh/) ^1.0
+- [Node.js](https://nodejs.org/) ^20.11
+- [pnpm](https://pnpm.io/)
 - `Biome` IDE Extension - For code formatting
 
 ## Getting Started
@@ -19,7 +20,7 @@ cd fcx
 ### Install dependencies
 
 ```bash
-bun install
+pnpm install
 ```
 
 ## Development
@@ -28,16 +29,16 @@ bun install
 
 ```bash
 # Without hosted local server
-bun run build:watch
+pnpm run build:watch
 
 # With hosted local server
-bun dev
+pnpm dev
 ```
 
 ### Build for GreasyFork
 
 ```bash
-bun run build:greasyfork
+pnpm run build:greasyfork
 ```
 
 ## Project structure

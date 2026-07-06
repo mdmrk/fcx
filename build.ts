@@ -1,6 +1,9 @@
 import { watch as fswatch, type WatchListener } from "node:fs"
+import { readFile, writeFile } from "node:fs/promises"
+import { createServer } from "node:http"
 import path from "node:path"
-import styleLoader from "bun-style-loader"
+import { inspect } from "node:util"
+import * as esbuild from "esbuild"
 import winston from "winston"
 import yargs from "yargs"
 import { hideBin } from "yargs/helpers"
@@ -88,6 +91,18 @@ const logger = winston.createLogger({
   exitOnError: false,
 })
 
+// Imports of style files (e.g. `import STYLES from "@/style.css"`) resolve to the
+// file's raw text, injected at runtime via GM_addStyle.
+const cssTextPlugin: esbuild.Plugin = {
+  name: "css-text",
+  setup(build) {
+    build.onLoad({ filter: /\.css$/ }, async args => {
+      const contents = await readFile(args.path, "utf8")
+      return { contents, loader: "text" }
+    })
+  },
+}
+
 const MINIMAL_USER_SCRIPT_HEADER_ITEMS = [
   "@name",
   "@namespace",
@@ -111,10 +126,6 @@ type MinimalUserScriptHeader = {
 type UserScriptHeader = MinimalUserScriptHeader & {
   [k: string]: string[] | string | boolean
 }
-
-// type ExtendedPackageJson = PackageJson & {
-//   userscriptHeader: UserScriptHeader;
-// };
 
 const VALID_RELEASE_CHANNELS = [
   "GitHubRelease",
@@ -158,12 +169,9 @@ function generateHeader(
     throw new Error("Missing required fields in package.json")
   }
 
-  // const distUserScript = `${PACKAGE_JSON.name}.user.js`;
   const url = (packageJson.repository as { url: string }).url
     .replace("git+", "")
     .replace(".git", "")
-  // const updateUrl = `${url}/raw/main/dist/${distUserScript}`;
-  // const downloadUrl = updateUrl;
 
   const releaseURL = generateReleaseURL(releaseChannel, {
     name: packageJson.name,
@@ -219,7 +227,7 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
   const { entrypointPath, buildSuffix, headerOverride = {} } = options
   let packageJson: typeof PACKAGE_JSON
   try {
-    packageJson = await Bun.file("./package.json").json()
+    packageJson = JSON.parse(await readFile("./package.json", "utf8"))
   } catch (error) {
     throw new Error("Failed to parse package.json", { cause: error })
   }
@@ -240,7 +248,7 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
 
   const distUserScript = `${packageJson.name}.user.js`
   const outputPath = `${path.dirname(entrypointPath)}/${distUserScript}`
-  const data = await Bun.file(entrypointPath).text()
+  const data = await readFile(entrypointPath, "utf8")
   // Check the existence of GM apis in data and check if they are added in header["@grant"]
   const grants = Array.isArray(header["@grant"])
     ? (header["@grant"] as string[])
@@ -293,7 +301,7 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
   output += HEADER_END
   output += data
 
-  await Bun.write(outputPath, output)
+  await writeFile(outputPath, output)
   logger.info(`Successfully added the header to the userscript ${outputPath}!`)
   return outputPath
 }
@@ -310,10 +318,11 @@ interface BuildOutput {
 async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
   const { dev = false, releaseChannel = "GitCommit" } = option
   const entrypoint = "./src/index.ts"
+  const entrypointPath = "./dist/index.js"
 
   try {
     // Check if entrypoint has exports
-    const indexContent = await Bun.file(entrypoint).text()
+    const indexContent = await readFile(entrypoint, "utf8")
     const hasExports = /^export\s+/m.test(indexContent)
 
     if (hasExports) {
@@ -328,34 +337,30 @@ async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
 
     logger.info(`Building ${entrypoint}`)
 
-    const build = await Bun.build({
-      entrypoints: [entrypoint],
-      outdir: "./dist",
+    const build = await esbuild.build({
+      entryPoints: [entrypoint],
+      outfile: entrypointPath,
+      bundle: true,
       minify: false,
-      sourcemap: dev ? "inline" : undefined,
+      sourcemap: dev ? "inline" : false,
       loader: {
         ".html": "text",
       },
-      plugins: [styleLoader()],
-      target: "browser",
+      plugins: [cssTextPlugin],
+      platform: "browser",
       format: "esm",
       define: {
         __DEV__: JSON.stringify(dev),
-        __dev__: JSON.stringify(dev),
       },
+      logLevel: "silent",
     })
-    logger.info(Bun.inspect(build, { colors: true }))
+    logger.info(inspect(build, { colors: true }))
 
-    if (!build.success) throw new Error(build.logs.join("\n"))
-
-    const entrypointPath = build.outputs.find(
-      artifact => artifact.kind === "entry-point"
-    )?.path
-    logger.info(`Running post build script with entrypoint ${entrypointPath}.`)
-
-    if (!entrypointPath) {
-      throw new Error("Cannot find entrypoint in built artifacts.")
+    for (const warning of build.warnings) {
+      logger.warn(warning.text)
     }
+
+    logger.info(`Running post build script with entrypoint ${entrypointPath}.`)
 
     const outputPath = await postBuildScript({
       entrypointPath,
@@ -367,7 +372,7 @@ async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
     }
   } catch (error) {
     if (error instanceof AggregateError) {
-      logger.error(Bun.inspect(error, { colors: true }))
+      logger.error(inspect(error, { colors: true }))
     } else if (error instanceof Error) {
       logger.error(error.message)
     } else {
@@ -389,8 +394,8 @@ function watch(option: BuildOption): Watcher {
     runBuilderFn(option)
   }
   const watchPaths = [
-    `${import.meta.dir}/src`,
-    `${import.meta.dir}/package.json`,
+    `${import.meta.dirname}/src`,
+    `${import.meta.dirname}/package.json`,
   ]
   const watchers = watchPaths.map(path =>
     fswatch(path, { recursive: true }, listener)
@@ -418,23 +423,28 @@ interface Server {
 function serve(option: ServerOption): Server {
   const { userscriptPath } = option
   const urlPath = `/${path.basename(userscriptPath)}`
-  const server = Bun.serve({
-    async fetch(req) {
-      const url = new URL(req.url)
-      if (url.pathname === "/") {
-        return Response.redirect(urlPath)
-      }
-      if (url.pathname === urlPath) {
-        return new Response(Bun.file(userscriptPath))
-      }
-      return Response.redirect("https://http.cat/404")
-    },
+  const server = createServer(async (req, res) => {
+    const url = new URL(req.url ?? "/", `http://${req.headers.host}`)
+    if (url.pathname === "/") {
+      res.writeHead(302, { Location: urlPath })
+      res.end()
+      return
+    }
+    if (url.pathname === urlPath) {
+      res.writeHead(200, { "Content-Type": "text/javascript" })
+      res.end(await readFile(userscriptPath))
+      return
+    }
+    res.writeHead(302, { Location: "https://http.cat/404" })
+    res.end()
   })
-  logger.info(`Listening on http://${server.hostname}:${server.port}/`)
+  server.listen(3000, () => {
+    logger.info("Listening on http://localhost:3000/")
+  })
   return {
     close: () => {
       logger.info("Stopping dev server...")
-      server.stop()
+      server.close()
       server.unref()
     },
   }

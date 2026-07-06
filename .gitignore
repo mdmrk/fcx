@@ -305,3 +305,9 @@ out
 
 # outputs
 /dist
+
+# FCX local dev browser profile (Helium/Chromium remote-debugging)
+.helium-dev/
+
+# Claude Code local config / notes
+.claude/

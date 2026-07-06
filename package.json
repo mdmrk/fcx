@@ -8,14 +8,15 @@
   },
   "module": "src/index.ts",
   "devDependencies": {
-    "@biomejs/biome": "2.3.11",
-    "@types/bun": "^1.3.5",
-    "@types/node": "^25.0.3",
+    "@biomejs/biome": "2.5.2",
+    "@types/node": "^26.1.0",
     "@types/yargs": "^17.0.35",
-    "bun-style-loader": "^0.4.0",
-    "rimraf": "^6.1.2",
+    "esbuild": "^0.28.1",
+    "rimraf": "^6.1.3",
+    "tsx": "^4.23.0",
+    "typescript": "^6.0.3",
     "winston": "^3.19.0",
-    "yargs": "18"
+    "yargs": "^18.0.0"
   },
   "bugs": {
     "url": "https://github.com/mdmrk/fcx/issues"
@@ -24,15 +25,15 @@
   "homepage": "https://github.com/mdmrk/fcx#readme",
   "license": "GNU General Public License v3.0",
   "scripts": {
-    "build": "bun build.ts",
-    "build:dev": "bun build.ts --dev",
-    "build:watch": "bun build.ts --dev --watch",
-    "build:workflow": "bun build.ts --release-channel GitHubRelease",
-    "build:greasyfork": "biome lint && tsc --noEmit && bun build.ts --release-channel GitHubRelease",
+    "build": "tsx build.ts",
+    "build:dev": "tsx build.ts --dev",
+    "build:watch": "tsx build.ts --dev --watch",
+    "build:workflow": "tsx build.ts --release-channel GitHubRelease",
+    "build:greasyfork": "biome lint && tsc --noEmit && tsx build.ts --release-channel GitHubRelease",
     "clean": "rimraf ./dist/",
     "format": "biome format --write .",
     "lint": "biome lint .",
-    "dev": "bun build.ts --dev --server --watch"
+    "dev": "tsx build.ts --dev --server --watch"
   },
   "type": "module",
   "userscriptHeader": {
