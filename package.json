@@ -2,6 +2,7 @@
   "name": "fcx",
   "version": "0.2.0",
   "author": "mdmrk",
+  "packageManager": "pnpm@11.3.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/mdmrk/fcx.git"
