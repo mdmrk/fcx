@@ -342,7 +342,7 @@ async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
       outfile: entrypointPath,
       bundle: true,
       minify: false,
-      sourcemap: dev ? "inline" : false,
+      sourcemap: dev ? "external" : false,
       loader: {
         ".html": "text",
       },

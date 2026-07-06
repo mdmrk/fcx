@@ -157,7 +157,9 @@ if (cmd === "html") {
   const t = pickTarget(pages, arg1)
   await injectInto(t)
   console.log(`Injected FCX into ${t.url}`)
-  console.log("Open the config panel with: node scripts/cdp.mjs eval '__fcxMenu()'")
+  console.log(
+    "Open the config panel with: node scripts/cdp.mjs eval '__fcxMenu()'"
+  )
 } else if (cmd === "watch") {
   const match = arg1
   const { watch } = await import("node:fs")
@@ -171,11 +173,15 @@ if (cmd === "html") {
   const reloadAndInject = async () => {
     try {
       const t = pickTarget(await listTargets(), match)
-      await evaluate(t.webSocketDebuggerUrl, "location.reload()").catch(() => {})
+      await evaluate(t.webSocketDebuggerUrl, "location.reload()").catch(
+        () => {}
+      )
       await sleep(400)
       await waitReady(t.webSocketDebuggerUrl)
       await injectInto(t)
-      console.log(`${new Date().toLocaleTimeString()}  reloaded + injected → ${t.url}`)
+      console.log(
+        `${new Date().toLocaleTimeString()}  reloaded + injected → ${t.url}`
+      )
     } catch (e) {
       console.error("reload failed:", e.message)
     }
@@ -187,7 +193,9 @@ if (cmd === "html") {
     clearTimeout(timer)
     timer = setTimeout(reloadAndInject, 200)
   })
-  console.log("Watching dist/fcx.user.js — edit src/ and the tab reloads. Ctrl-C to stop.")
+  console.log(
+    "Watching dist/fcx.user.js — edit src/ and the tab reloads. Ctrl-C to stop."
+  )
 } else {
   console.error(
     "commands: tabs | html [match] | sel '<css>' [match] | eval '<js>' [match] | inject [match] | watch [match]"

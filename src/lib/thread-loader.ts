@@ -11,7 +11,9 @@ import { CONFIG_KEYS } from "@/config-registry"
 const DEFAULT_MAX_EAGER_PAGES = 50
 
 const getMaxEagerPages = (): number => {
-  const v = Number(getConfig(CONFIG_KEYS.MAX_EAGER_PAGES, DEFAULT_MAX_EAGER_PAGES))
+  const v = Number(
+    getConfig(CONFIG_KEYS.MAX_EAGER_PAGES, DEFAULT_MAX_EAGER_PAGES)
+  )
   return Number.isFinite(v) && v > 0 ? v : DEFAULT_MAX_EAGER_PAGES
 }
 
