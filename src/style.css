@@ -196,9 +196,18 @@ html.fcx-compact #posts {
     margin-bottom: 6px;
   }
 
+  /* Single-line header: name, rank, timestamp and post id all on one row. */
   .postbit_wrapper > div:first-child {
+    gap: 14px;
     /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
     margin-bottom: 4px !important;
+
+    & > div:last-child {
+      /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline column */
+      flex-direction: row !important;
+      align-items: baseline;
+      gap: 6px;
+    }
   }
 
   img.thread-profile-image {
@@ -212,8 +221,12 @@ html.fcx-compact #posts {
   }
 
   div[style*="margin-left: 28px"] {
+    align-items: baseline;
+    gap: 8px;
     /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
     margin-left: 10px !important;
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline column */
+    flex-direction: row !important;
   }
 
   /* Post actions: icon only (hide "Citar" label), smaller icons grouped left. */
