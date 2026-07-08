@@ -6,7 +6,7 @@ Mejora la navegación en ForoCoches.
 [![CI](https://img.shields.io/github/actions/workflow/status/mdmrk/fcx/release.yml?label=ci&style=flat-square)](https://github.com/mdmrk/fcx/actions)
 [![GitHub](https://img.shields.io/badge/GitHub-mdmrk%2Ffcx-blue?style=flat-square&logo=github)](https://github.com/mdmrk/fcx)
 
-<img style="width: 600px" src=".github/demo.png"/>
+<img src=".github/demo.png"/>
 
 ## Índice
 
