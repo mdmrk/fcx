@@ -13,7 +13,7 @@ Mejora la navegación en ForoCoches.
 
 ## Instalación
 
-https://greasyfork.org/en/scripts/560544-fcx
+<a href="https://greasyfork.org/en/scripts/560544-fcx" target="_blank" rel="noopener">https://greasyfork.org/en/scripts/560544-fcx</a>
 
 ## Características
 
