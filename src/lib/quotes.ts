@@ -38,9 +38,6 @@ const quoteTargetId = (squote: Element): string | null => {
   return m ? (m[1] ?? m[2]) : null
 }
 
-// Replace a post's embedded quotes with a 4chan-style line of »mention links,
-// placed between the header and the message body. Only top-level quotes whose
-// target post is on the page are converted; others are left untouched.
 const processMessage = (msg: HTMLElement) => {
   if (msg.dataset.fcxq) return
   msg.dataset.fcxq = "1"
@@ -69,8 +66,6 @@ const processAll = (root: ParentNode = document) => {
     processMessage(msg)
 }
 
-// Click inlines the whole referenced post below the quote line, indented; a
-// second click removes it. Clones carry their own »links, so quotes nest.
 const toggleInline = (link: HTMLElement) => {
   const id = link.dataset.id
   const line = link.closest<HTMLElement>(".fcx-quotes")

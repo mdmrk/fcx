@@ -16,6 +16,9 @@
       "preset": "recommended",
       "style": {
         "noNonNullAssertion": "off"
+      },
+      "complexity": {
+        "noImportantStyles": "off"
       }
     }
   },

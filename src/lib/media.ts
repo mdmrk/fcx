@@ -32,7 +32,6 @@ const hidePreview = () => {
 const isPostImage = (t: EventTarget | null): t is HTMLImageElement =>
   t instanceof HTMLImageElement && t.classList.contains("imgpost")
 
-// Post images and avatars get a hover preview; only post images expand on click.
 const isHoverable = (t: EventTarget | null): t is HTMLImageElement =>
   isPostImage(t) ||
   (t instanceof HTMLImageElement &&

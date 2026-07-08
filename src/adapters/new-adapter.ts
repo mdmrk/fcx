@@ -7,6 +7,8 @@ import { logger } from "@/utils/logger"
 import { getEffectiveConfig } from "@/utils/storage"
 import { CONFIG_KEYS } from "@/config-registry"
 import { removeBanners } from "@/lib/remove-banners"
+import { currentPageType } from "@/utils/page-state"
+import { PageType } from "@/types/page-state"
 
 export class NewSiteAdapter implements SiteAdapter {
   name = "New Interface"
@@ -31,8 +33,10 @@ export class NewSiteAdapter implements SiteAdapter {
   }
 
   private removeSidebar() {
-    const shouldRemove = getEffectiveConfig(CONFIG_KEYS.REMOVE_SIDEBAR, "new")
-    if (!shouldRemove) return
+    // Threads always drop the sidebar, ignoring the toggle.
+    const isThread = currentPageType === PageType.THREAD
+    if (!isThread && !getEffectiveConfig(CONFIG_KEYS.REMOVE_SIDEBAR, "new"))
+      return
 
     const sidebar = document.querySelector("#sidebar")
     if (sidebar) sidebar.remove()
