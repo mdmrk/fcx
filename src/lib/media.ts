@@ -32,9 +32,15 @@ const hidePreview = () => {
 const isPostImage = (t: EventTarget | null): t is HTMLImageElement =>
   t instanceof HTMLImageElement && t.classList.contains("imgpost")
 
+// Post images and avatars get a hover preview; only post images expand on click.
+const isHoverable = (t: EventTarget | null): t is HTMLImageElement =>
+  isPostImage(t) ||
+  (t instanceof HTMLImageElement &&
+    t.classList.contains("thread-profile-image"))
+
 export const initMedia = () => {
   document.addEventListener("mouseover", e => {
-    if (!isPostImage(e.target) || e.target.classList.contains("fcx-expanded"))
+    if (!isHoverable(e.target) || e.target.classList.contains("fcx-expanded"))
       return
     const el = ensurePreview()
     el.src = e.target.currentSrc || e.target.src
@@ -45,7 +51,7 @@ export const initMedia = () => {
     if (preview?.style.display === "block") position(e)
   })
   document.addEventListener("mouseout", e => {
-    if (isPostImage(e.target)) hidePreview()
+    if (isHoverable(e.target)) hidePreview()
   })
   document.addEventListener(
     "click",

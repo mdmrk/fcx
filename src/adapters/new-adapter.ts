@@ -1,6 +1,7 @@
 import type { SiteAdapter, SelectorConfig } from "@/types/adapter"
 import { initThreadLoader } from "@/lib/thread-loader"
 import { initMedia } from "@/lib/media"
+import { initQuotes } from "@/lib/quotes"
 import { newSelectors } from "@/config"
 import { logger } from "@/utils/logger"
 import { getEffectiveConfig } from "@/utils/storage"
@@ -26,6 +27,7 @@ export class NewSiteAdapter implements SiteAdapter {
     if (!getEffectiveConfig(CONFIG_KEYS.COMPACT_THREADS, "new")) return
     document.documentElement.classList.add("fcx-compact")
     initMedia()
+    initQuotes()
   }
 
   private removeSidebar() {

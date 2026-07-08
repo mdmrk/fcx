@@ -148,8 +148,55 @@
 
 /* Compact thread view, enabled via the .fcx-compact class on <html>. */
 html.fcx-compact #posts section {
-  padding-top: 6px;
-  padding-bottom: 6px;
+  padding: 6px 10px;
+  width: fit-content;
+  max-width: 100%;
+}
+
+html.fcx-compact #posts [id^="post_message_"] table,
+html.fcx-compact #posts [id^="post_message_"] td {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline width */
+  width: auto !important;
+}
+
+/* 4chan-style quotes: embedded quotes become »mention links after the header;
+   hover previews the post, click inlines the whole post below (see quotes.ts). */
+html.fcx-compact #posts .fcx-quotes {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px 10px;
+  margin: 2px 0 4px;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+html.fcx-compact #posts .fcx-ql {
+  color: #e00;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+html.fcx-compact #posts .fcx-ql:hover {
+  text-decoration: underline;
+}
+
+html.fcx-compact #posts .fcx-inline {
+  margin: 4px 0 4px 16px;
+  border-left: 2px solid rgba(128, 128, 128, 0.4);
+  padding-left: 6px;
+}
+
+#fcx-quote-preview {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  max-width: 600px;
+  max-height: 70vh;
+  overflow: hidden;
+  padding: 8px 10px;
+  pointer-events: none;
+  font-size: 0.875rem;
+  background: var(--bg-color, #fff);
 }
 
 html.fcx-compact #posts separator-large {
@@ -179,6 +226,41 @@ html.fcx-compact #posts a:has(> img.thread-profile-image) {
 html.fcx-compact #posts div[style*="margin-left: 28px"] {
   /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
   margin-left: 10px !important;
+}
+
+/* Post actions: icon only (hide "Citar" label), smaller icons grouped left. */
+html.fcx-compact
+  #posts
+  a:has(> span.post-controls-icon)
+  > span:not(.post-controls-icon) {
+  display: none;
+}
+
+html.fcx-compact #posts div[style*="justify-content: space-around"] {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline flex */
+  justify-content: flex-start !important;
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline gap */
+  gap: 2px !important;
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline padding */
+  padding: 2px 4px !important;
+}
+
+html.fcx-compact #posts div[style*="justify-content: space-around"] a,
+html.fcx-compact #posts div[style*="justify-content: space-around"] > div {
+  padding: 1px;
+}
+
+html.fcx-compact #posts span.post-controls-icon {
+  width: 15px;
+  height: 15px;
+  background-size: contain;
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline margin */
+  margin-right: 0 !important;
+}
+
+html.fcx-compact #posts div[style*="justify-content: space-around"] img.inlineimg {
+  width: 15px;
+  height: 15px;
 }
 
 html.fcx-compact #posts img.imgpost {
