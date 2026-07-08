@@ -8,4 +8,7 @@ export const removeBanners = (scope: "new" | "old") => {
   if (banner) {
     banner.remove()
   }
+  for (const promo of document.querySelectorAll(".fc-custom-promo")) {
+    promo.remove()
+  }
 }
