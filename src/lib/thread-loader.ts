@@ -74,21 +74,6 @@ const getTotalPages = (
   return max
 }
 
-const createSeparator = (page: number): HTMLElement => {
-  const div = document.createElement("div")
-  div.className = "infinite-scroll-separator"
-
-  const line = document.createElement("div")
-  line.className = "infinite-scroll-separator-line"
-
-  const span = document.createElement("span")
-  span.className = "infinite-scroll-separator-text"
-  span.textContent = `Página ${page}`
-
-  div.append(line, span)
-  return div
-}
-
 class ThreadLoader {
   private loading = false
   private nextPage: number
@@ -143,12 +128,11 @@ class ThreadLoader {
     }
   }
 
-  private appendPage(page: number, nodes: Element[]) {
-    this.feed.append(createSeparator(page))
+  private appendPage(nodes: Element[]) {
     for (const node of nodes) this.feed.append(document.importNode(node, true))
   }
 
-  private prependPage(page: number, nodes: Element[]) {
+  private prependPage(nodes: Element[]) {
     const root = document.documentElement
     const prevHeight = root.scrollHeight
     const prevTop = root.scrollTop
@@ -157,7 +141,6 @@ class ThreadLoader {
     for (const node of nodes) {
       this.feed.insertBefore(document.importNode(node, true), first)
     }
-    this.feed.insertBefore(createSeparator(page), first)
 
     // Keep the viewport anchored while content is inserted above it.
     root.scrollTop = prevTop + (root.scrollHeight - prevHeight)
@@ -184,13 +167,13 @@ class ThreadLoader {
       while (ready.has(nextFwd)) {
         const nodes = ready.get(nextFwd)!
         ready.delete(nextFwd)
-        if (nodes.length) this.appendPage(nextFwd, nodes)
+        if (nodes.length) this.appendPage(nodes)
         nextFwd++
       }
       while (ready.has(nextBwd)) {
         const nodes = ready.get(nextBwd)!
         ready.delete(nextBwd)
-        if (nodes.length) this.prependPage(nextBwd, nodes)
+        if (nodes.length) this.prependPage(nodes)
         nextBwd--
       }
     }
@@ -235,11 +218,11 @@ class ThreadLoader {
       const done = await this.withLock(async () => {
         if (edge === "after") {
           const nodes = await this.fetchPageNodes(this.nextPage)
-          if (nodes) this.appendPage(this.nextPage, nodes)
+          if (nodes) this.appendPage(nodes)
           this.nextPage++
         } else {
           const nodes = await this.fetchPageNodes(this.prevPage)
-          if (nodes) this.prependPage(this.prevPage, nodes)
+          if (nodes) this.prependPage(nodes)
           this.prevPage--
         }
       })
