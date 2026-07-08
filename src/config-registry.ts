@@ -5,6 +5,7 @@ export const CONFIG_KEYS = {
   INFINITE_SCROLL: "infinite_scroll",
   REMOVE_BANNERS: "remove_banners",
   MAX_EAGER_PAGES: "max_eager_pages",
+  COMPACT_THREADS: "compact_threads",
 }
 
 export const configs: ConfigDefinition[] = [
@@ -41,5 +42,14 @@ export const configs: ConfigDefinition[] = [
     description: "Oculta los banners de publicidad.",
     defaultValue: true,
     type: "checkbox",
+  },
+  {
+    key: CONFIG_KEYS.COMPACT_THREADS,
+    label: "Vista compacta",
+    description:
+      "Reduce el espaciado entre mensajes para mostrar más contenido en pantalla.",
+    defaultValue: true,
+    type: "checkbox",
+    scopes: ["new"],
   },
 ]

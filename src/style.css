@@ -145,3 +145,59 @@
 #fcx-footer a:hover {
   color: #ccc;
 }
+
+/* Compact thread view, enabled via the .fcx-compact class on <html>. */
+html.fcx-compact #posts section {
+  padding-top: 6px;
+  padding-bottom: 6px;
+}
+
+html.fcx-compact #posts separator-large {
+  height: 2px;
+}
+
+/* biome-ignore lint/correctness/noUnknownTypeSelector: FC custom element */
+html.fcx-compact #posts separator {
+  margin-bottom: 6px;
+}
+
+html.fcx-compact #posts .postbit_wrapper > div:first-child {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
+  margin-bottom: 4px !important;
+}
+
+html.fcx-compact #posts img.thread-profile-image {
+  width: 28px;
+  height: 28px;
+}
+
+html.fcx-compact #posts a:has(> img.thread-profile-image) {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
+  height: 28px !important;
+}
+
+html.fcx-compact #posts div[style*="margin-left: 28px"] {
+  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
+  margin-left: 10px !important;
+}
+
+html.fcx-compact #posts img.imgpost {
+  max-height: 90px;
+  width: auto;
+  height: auto;
+  cursor: pointer;
+}
+
+html.fcx-compact #posts img.imgpost.fcx-expanded {
+  max-height: none;
+  max-width: none;
+}
+
+#fcx-media-preview {
+  display: none;
+  position: fixed;
+  z-index: 99999;
+  max-width: 90vw;
+  max-height: 90vh;
+  pointer-events: none;
+}
