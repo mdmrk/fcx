@@ -30,7 +30,7 @@
       "trailingCommas": "es5",
       "bracketSameLine": true
     },
-    "globals": ["__DEV__", "__dev__"]
+    "globals": ["__DEV__"]
   },
   "css": {
     "formatter": {
