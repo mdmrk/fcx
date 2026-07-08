@@ -147,45 +147,121 @@
 }
 
 /* Compact thread view, enabled via the .fcx-compact class on <html>. */
-html.fcx-compact #posts section {
-  padding: 6px 10px;
-  width: fit-content;
-  max-width: 100%;
+html.fcx-compact #posts {
+  section {
+    padding: 6px 10px;
+    width: fit-content;
+    max-width: 100%;
+  }
+
+  [id^="post_message_"] table,
+  [id^="post_message_"] td {
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline width */
+    width: auto !important;
+  }
+
+  /* 4chan-style quotes: embedded quotes become »mention links after the header;
+     hover previews the post, click inlines the whole post below (quotes.ts). */
+  .fcx-quotes {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px 10px;
+    margin: 2px 0 4px;
+    font-size: 0.8rem;
+    line-height: 1.2;
+  }
+
+  .fcx-ql {
+    color: #e00;
+    cursor: pointer;
+    text-decoration: none;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  .fcx-inline {
+    margin: 4px 0 4px 16px;
+    border-left: 2px solid rgba(128, 128, 128, 0.4);
+    padding-left: 6px;
+  }
+
+  separator-large {
+    height: 2px;
+  }
+
+  /* biome-ignore lint/correctness/noUnknownTypeSelector: FC custom element */
+  separator {
+    margin-bottom: 6px;
+  }
+
+  .postbit_wrapper > div:first-child {
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
+    margin-bottom: 4px !important;
+  }
+
+  img.thread-profile-image {
+    width: 28px;
+    height: 28px;
+  }
+
+  a:has(> img.thread-profile-image) {
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
+    height: 28px !important;
+  }
+
+  div[style*="margin-left: 28px"] {
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
+    margin-left: 10px !important;
+  }
+
+  /* Post actions: icon only (hide "Citar" label), smaller icons grouped left. */
+  a:has(> span.post-controls-icon) > span:not(.post-controls-icon) {
+    display: none;
+  }
+
+  div[style*="justify-content: space-around"] {
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline flex */
+    justify-content: flex-start !important;
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline gap */
+    gap: 2px !important;
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline padding */
+    padding: 2px 4px !important;
+
+    a,
+    & > div {
+      padding: 1px;
+    }
+
+    img.inlineimg {
+      width: 15px;
+      height: 15px;
+    }
+  }
+
+  span.post-controls-icon {
+    width: 15px;
+    height: 15px;
+    background-size: contain;
+    /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline margin */
+    margin-right: 0 !important;
+  }
+
+  img.imgpost {
+    max-height: 90px;
+    width: auto;
+    height: auto;
+    cursor: pointer;
+
+    &.fcx-expanded {
+      max-height: none;
+      max-width: none;
+    }
+  }
 }
 
-html.fcx-compact #posts [id^="post_message_"] table,
-html.fcx-compact #posts [id^="post_message_"] td {
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline width */
-  width: auto !important;
-}
-
-/* 4chan-style quotes: embedded quotes become »mention links after the header;
-   hover previews the post, click inlines the whole post below (see quotes.ts). */
-html.fcx-compact #posts .fcx-quotes {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px 10px;
-  margin: 2px 0 4px;
-  font-size: 0.8rem;
-  line-height: 1.2;
-}
-
-html.fcx-compact #posts .fcx-ql {
-  color: #e00;
-  cursor: pointer;
-  text-decoration: none;
-}
-
-html.fcx-compact #posts .fcx-ql:hover {
-  text-decoration: underline;
-}
-
-html.fcx-compact #posts .fcx-inline {
-  margin: 4px 0 4px 16px;
-  border-left: 2px solid rgba(128, 128, 128, 0.4);
-  padding-left: 6px;
-}
-
+/* Floating hover previews (appended to <body>, not scoped to #posts). */
 #fcx-quote-preview {
   display: none;
   position: fixed;
@@ -197,82 +273,6 @@ html.fcx-compact #posts .fcx-inline {
   pointer-events: none;
   font-size: 0.875rem;
   background: var(--bg-color, #fff);
-}
-
-html.fcx-compact #posts separator-large {
-  height: 2px;
-}
-
-/* biome-ignore lint/correctness/noUnknownTypeSelector: FC custom element */
-html.fcx-compact #posts separator {
-  margin-bottom: 6px;
-}
-
-html.fcx-compact #posts .postbit_wrapper > div:first-child {
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
-  margin-bottom: 4px !important;
-}
-
-html.fcx-compact #posts img.thread-profile-image {
-  width: 28px;
-  height: 28px;
-}
-
-html.fcx-compact #posts a:has(> img.thread-profile-image) {
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
-  height: 28px !important;
-}
-
-html.fcx-compact #posts div[style*="margin-left: 28px"] {
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline style */
-  margin-left: 10px !important;
-}
-
-/* Post actions: icon only (hide "Citar" label), smaller icons grouped left. */
-html.fcx-compact
-  #posts
-  a:has(> span.post-controls-icon)
-  > span:not(.post-controls-icon) {
-  display: none;
-}
-
-html.fcx-compact #posts div[style*="justify-content: space-around"] {
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline flex */
-  justify-content: flex-start !important;
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline gap */
-  gap: 2px !important;
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline padding */
-  padding: 2px 4px !important;
-}
-
-html.fcx-compact #posts div[style*="justify-content: space-around"] a,
-html.fcx-compact #posts div[style*="justify-content: space-around"] > div {
-  padding: 1px;
-}
-
-html.fcx-compact #posts span.post-controls-icon {
-  width: 15px;
-  height: 15px;
-  background-size: contain;
-  /* biome-ignore lint/complexity/noImportantStyles: overrides FC inline margin */
-  margin-right: 0 !important;
-}
-
-html.fcx-compact #posts div[style*="justify-content: space-around"] img.inlineimg {
-  width: 15px;
-  height: 15px;
-}
-
-html.fcx-compact #posts img.imgpost {
-  max-height: 90px;
-  width: auto;
-  height: auto;
-  cursor: pointer;
-}
-
-html.fcx-compact #posts img.imgpost.fcx-expanded {
-  max-height: none;
-  max-width: none;
 }
 
 #fcx-media-preview {

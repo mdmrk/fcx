@@ -4,6 +4,7 @@ import { createServer } from "node:http"
 import path from "node:path"
 import { inspect } from "node:util"
 import * as esbuild from "esbuild"
+import { transform as transformCss } from "lightningcss"
 import winston from "winston"
 import yargs from "yargs"
 import { hideBin } from "yargs/helpers"
@@ -92,16 +93,22 @@ const logger = winston.createLogger({
 })
 
 // Imports of style files (e.g. `import STYLES from "@/style.css"`) resolve to the
-// file's raw text, injected at runtime via GM_addStyle.
-const cssTextPlugin: esbuild.Plugin = {
+// file's text, injected at runtime via GM_addStyle. Lightning CSS flattens
+// nesting and (outside dev) minifies before the string is embedded.
+const cssTextPlugin = (dev: boolean): esbuild.Plugin => ({
   name: "css-text",
   setup(build) {
     build.onLoad({ filter: /\.css$/ }, async args => {
-      const contents = await readFile(args.path, "utf8")
-      return { contents, loader: "text" }
+      const source = await readFile(args.path)
+      const { code } = transformCss({
+        filename: args.path,
+        code: source,
+        minify: !dev,
+      })
+      return { contents: code, loader: "text" }
     })
   },
-}
+})
 
 const MINIMAL_USER_SCRIPT_HEADER_ITEMS = [
   "@name",
@@ -346,7 +353,7 @@ async function runBuilderFn(option: BuildOption): Promise<BuildOutput> {
       loader: {
         ".html": "text",
       },
-      plugins: [cssTextPlugin],
+      plugins: [cssTextPlugin(dev)],
       platform: "browser",
       format: "esm",
       define: {
