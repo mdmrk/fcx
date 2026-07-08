@@ -237,6 +237,10 @@ html.fcx-compact #posts {
       display: none;
     }
 
+    a:has(> img.inlineimg) {
+      margin-left: 0 !important;
+    }
+
     span.post-controls-icon,
     img.inlineimg {
       background-size: contain;
