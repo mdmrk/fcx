@@ -250,7 +250,7 @@ html.fcx-compact #posts {
     }
   }
 
-  img.imgpost {
+  & > *:not(:first-child) img.imgpost {
     max-height: 90px;
     width: auto;
     height: auto;
