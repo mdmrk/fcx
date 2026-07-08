@@ -24,3 +24,4 @@ Mejora la navegación en ForoCoches.
 - Menú de configuración
 - Compatibilidad con versión antigua y nueva 
 - Varios retoques de interfaz y calidad de vida
+- Modo compacto para una navegación más hábil
