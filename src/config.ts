@@ -1,5 +1,3 @@
-export const devMode = __DEV__
-
 export const oldSelectors = {
   feedContainer: "#posts",
 }

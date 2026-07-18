@@ -8,12 +8,7 @@ type JSONSerializable =
 
 declare global {
   // Fix the TypeScript error
-  // "Cannot find module './logo.svg' or its corresponding type declarations."
-  declare module "*.html" {
-    const content: string
-    export default content
-  }
-
+  // "Cannot find module './style.css' or its corresponding type declarations."
   declare module "*.css" {
     const content: string
     export default content

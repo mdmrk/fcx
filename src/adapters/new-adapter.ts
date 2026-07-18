@@ -1,14 +1,13 @@
-import type { SiteAdapter, SelectorConfig } from "@/types/adapter"
-import { initThreadLoader } from "@/lib/thread-loader"
+import { newSelectors } from "@/config"
+import { CONFIG_KEYS } from "@/config-registry"
 import { initMedia } from "@/lib/media"
 import { initQuotes } from "@/lib/quotes"
-import { newSelectors } from "@/config"
-import { logger } from "@/utils/logger"
-import { getEffectiveConfig } from "@/utils/storage"
-import { CONFIG_KEYS } from "@/config-registry"
 import { removeBanners } from "@/lib/remove-banners"
-import { currentPageType } from "@/utils/page-state"
-import { PageType } from "@/types/page-state"
+import { initThreadLoader } from "@/lib/thread-loader"
+import type { SelectorConfig, SiteAdapter } from "@/types/adapter"
+import { logger } from "@/utils/logger"
+import { isThreadPage } from "@/utils/page-state"
+import { getEffectiveConfig } from "@/utils/storage"
 
 export class NewSiteAdapter implements SiteAdapter {
   name = "New Interface"
@@ -34,8 +33,7 @@ export class NewSiteAdapter implements SiteAdapter {
 
   private removeSidebar() {
     // Threads always drop the sidebar, ignoring the toggle.
-    const isThread = currentPageType === PageType.THREAD
-    if (!isThread && !getEffectiveConfig(CONFIG_KEYS.REMOVE_SIDEBAR, "new"))
+    if (!isThreadPage && !getEffectiveConfig(CONFIG_KEYS.REMOVE_SIDEBAR, "new"))
       return
 
     const sidebar = document.querySelector("#sidebar")

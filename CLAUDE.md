@@ -142,12 +142,10 @@ daños colaterales.
 `.github/workflows/release.yml` dispara con `push: tags: ['v*']` y publica
 `dist/fcx.user.js` en una GitHub Release. `ci.yml` corre lint/format en `main` y PRs.
 
-Dos cosas que confunden:
+Una cosa que confunde:
 
-1. **Ambos workflows se llaman `name: ci`**, así que la ejecución de release aparece
-   etiquetada como "ci" en la pestaña Actions y parece que no ha corrido.
-2. **Empujar rama y tag en el mismo `git push` puede tragarse el evento del tag** y el
-   release no se dispara. Empuja el tag como push independiente:
+**Empujar rama y tag en el mismo `git push` puede tragarse el evento del tag** y el
+release no se dispara. Empuja el tag como push independiente:
 
 ```bash
 git push origin main
@@ -157,8 +155,9 @@ git push origin v0.3.1     # push aparte
 Si el tag ya está en remoto sin haber disparado nada, hay que recrear el evento:
 `git push origin :refs/tags/vX.Y.Z` y volver a empujarlo.
 
-La versión vive solo en `package.json`; el workflow la lee de ahí. Convención de tag:
-`vX.Y.Z`, y el commit de release se titula igual (`v0.3.1`).
+La versión vive solo en `package.json`; la release toma el nombre del tag. Convención
+de tag: `vX.Y.Z` (debe coincidir con la versión), y el commit de release se titula
+igual (`v0.3.1`).
 
 Behavioral guidelines to reduce common LLM coding mistakes. Merge with project-specific instructions as needed.
 

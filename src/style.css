@@ -310,8 +310,7 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
 /* Hide the post action bar (citar/responder/…) in the preview, targeting its
    wrapper so the separator above it goes too. !important because the wrapper
    carries an inline display:flex. */
-html.fcx-compact
-  #fcx-quote-preview
+html.fcx-compact #fcx-quote-preview
   div:has(> div[style*="justify-content: space-around"]) {
   display: none !important;
 }

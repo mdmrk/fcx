@@ -1,16 +1,11 @@
-import { devMode } from "@/config"
-
 export const logger = {
   log: (...args: unknown[]) => {
-    if (devMode) console.log(...args)
+    if (__DEV__) console.log("[FCX]", ...args)
   },
   warn: (...args: unknown[]) => {
-    if (devMode) console.warn(...args)
+    if (__DEV__) console.warn("[FCX]", ...args)
   },
   error: (...args: unknown[]) => {
-    if (devMode) console.error(...args)
-  },
-  info: (...args: unknown[]) => {
-    if (devMode) console.info(...args)
+    if (__DEV__) console.error("[FCX]", ...args)
   },
 }

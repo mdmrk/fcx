@@ -1,9 +1,8 @@
-import { logger } from "@/utils/logger"
-import type { SelectorConfig } from "@/types/adapter"
-import { currentPageType } from "@/utils/page-state"
-import { PageType } from "@/types/page-state"
-import { getConfig } from "@/utils/storage"
 import { CONFIG_KEYS } from "@/config-registry"
+import type { SelectorConfig } from "@/types/adapter"
+import { logger } from "@/utils/logger"
+import { isThreadPage } from "@/utils/page-state"
+import { getConfig } from "@/utils/storage"
 
 // Threads with more remaining pages than this are loaded progressively (on
 // scroll) instead of all at once, to avoid a flood of requests and a huge DOM.
@@ -273,7 +272,7 @@ class LoadStatus {
 }
 
 export const initThreadLoader = (selectors: SelectorConfig) => {
-  if (currentPageType !== PageType.THREAD) {
+  if (!isThreadPage) {
     logger.log("Thread loader: not a thread page.")
     return
   }

@@ -1,4 +1,4 @@
-name: ci
+name: release
 
 on:
   push:
@@ -7,38 +7,23 @@ on:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-    
     steps:
     - uses: actions/checkout@v4
-
-    - name: Setup pnpm
-      uses: pnpm/action-setup@v4
-
-    - name: Setup Node
-      uses: actions/setup-node@v4
+    - uses: pnpm/action-setup@v4
+    - uses: actions/setup-node@v4
       with:
         node-version: lts/*
         cache: pnpm
-
-    - name: Install dependencies
-      run: pnpm install --frozen-lockfile
-
-    - name: Build
-      run: pnpm run build:greasyfork
-      
-    - name: Get version from package.json
-      id: version
-      run: echo "version=$(grep '"version":' package.json | cut -d'"' -f4)" >> $GITHUB_OUTPUT
-    
+    - run: pnpm install --frozen-lockfile
+    - run: pnpm run build:greasyfork
     - name: Create Release
       uses: softprops/action-gh-release@v2
       with:
         files: dist/fcx.user.js
-        tag_name: v${{ steps.version.outputs.version }}
-        name: Release v${{ steps.version.outputs.version }}
+        name: Release ${{ github.ref_name }}
         body: |
           Automated release of FCX
-          
+
           Built from commit: ${{ github.sha }}
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

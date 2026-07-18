@@ -5,7 +5,7 @@ export interface ConfigDefinition {
   label: string
   description: string
   defaultValue: ConfigValue
-  type: "checkbox" | "text" | "number"
+  type: "checkbox" | "number"
   scopes?: ("new" | "old")[]
   min?: number
   max?: number

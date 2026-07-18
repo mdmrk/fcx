@@ -6,7 +6,7 @@ on:
   pull_request:
 
 jobs:
-  lint:
+  check:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -16,16 +16,4 @@ jobs:
         node-version: lts/*
         cache: pnpm
     - run: pnpm install --frozen-lockfile
-    - run: pnpm biome lint .
-
-  format:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v4
-    - uses: pnpm/action-setup@v4
-    - uses: actions/setup-node@v4
-      with:
-        node-version: lts/*
-        cache: pnpm
-    - run: pnpm install --frozen-lockfile
-    - run: pnpm biome format .
+    - run: pnpm biome ci .

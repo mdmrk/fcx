@@ -1,11 +1,6 @@
 import { configs } from "@/config-registry"
 import type { ConfigDefinition } from "@/types/config"
-import {
-  getConfig,
-  setConfig,
-  resetConfig,
-  getScopedConfigKey,
-} from "@/utils/storage"
+import { getConfig, getScopedConfigKey, setConfig } from "@/utils/storage"
 
 const createCheckbox = (checked: boolean, onChange: (val: boolean) => void) => {
   const input = document.createElement("input")
@@ -205,13 +200,13 @@ const openPanel = () => {
   resetLink.onclick = () => {
     if (confirm("¿Restaurar toda la configuración?")) {
       configs.forEach(c => {
-        resetConfig(c.key, c.defaultValue)
+        setConfig(c.key, c.defaultValue)
         if (c.type !== "checkbox") return
         if (!c.scopes || c.scopes.includes("new")) {
-          resetConfig(getScopedConfigKey(c.key, "new"), false)
+          setConfig(getScopedConfigKey(c.key, "new"), false)
         }
         if (!c.scopes || c.scopes.includes("old")) {
-          resetConfig(getScopedConfigKey(c.key, "old"), false)
+          setConfig(getScopedConfigKey(c.key, "old"), false)
         }
       })
       closePanel()
