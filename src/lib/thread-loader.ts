@@ -21,7 +21,7 @@ const LOAD_CONCURRENCY = 4
 
 const SENTINEL_MARGIN = "600px"
 
-const pageUrl = (page: number): string => {
+export const pageUrl = (page: number): string => {
   const url = new URL(window.location.href)
   url.searchParams.set("page", String(page))
   url.searchParams.delete("goto")
@@ -31,7 +31,7 @@ const pageUrl = (page: number): string => {
 
 const parseCount = (raw: string): number => Number(raw.replace(/\./g, ""))
 
-const getCurrentPage = (): number => {
+export const getCurrentPage = (): number => {
   const raw = new URL(window.location.href).searchParams.get("page")
   const n = raw ? parseInt(raw, 10) : 1
   return Number.isFinite(n) && n > 0 ? n : 1
@@ -43,7 +43,7 @@ const getCurrentPage = (): number => {
  * per-page size — user-configurable, so not hardcoded — is derived. Falls back
  * to the highest `page=` link in the document (old interface / safety net).
  */
-const getTotalPages = (
+export const getTotalPages = (
   doc: ParentNode,
   selectors: SelectorConfig,
   currentPage: number
@@ -82,7 +82,8 @@ class ThreadLoader {
     private readonly feed: HTMLElement,
     private readonly selectors: SelectorConfig,
     private readonly currentPage: number,
-    private readonly totalPages: number
+    private readonly totalPages: number,
+    private readonly onEndReached?: (lastPage: number) => void
   ) {
     this.nextPage = currentPage + 1
     this.prevPage = currentPage - 1
@@ -90,14 +91,18 @@ class ThreadLoader {
 
   start() {
     const remaining = this.totalPages - 1 // every page except the current one
-    if (remaining <= 0) return
+    if (remaining <= 0) {
+      this.onEndReached?.(this.totalPages)
+      return
+    }
 
     if (remaining <= getMaxEagerPages()) {
       // Small enough: pull the whole thread (both directions) up front.
-      this.eagerLoadAll()
+      this.eagerLoadAll().then(() => this.onEndReached?.(this.totalPages))
     } else {
       // Too many pages to bulk-load: fall back to lazy loading on scroll.
       if (this.nextPage <= this.totalPages) this.observe("after")
+      else this.onEndReached?.(this.totalPages)
       if (this.prevPage >= 1) this.observe("before")
     }
   }
@@ -208,10 +213,6 @@ class ThreadLoader {
 
     let intersecting = false
 
-    // Load pages while the sentinel is in view. IntersectionObserver only fires
-    // on intersection *changes*, so a sentinel that stays continuously visible
-    // (e.g. it's already on screen when you land, or eager-loading held the lock
-    // when it first fired) must be pumped manually until it scrolls out of view.
     const pump = async () => {
       if (!intersecting) return
       const done = await this.withLock(async () => {
@@ -226,7 +227,6 @@ class ThreadLoader {
         }
       })
       if (!done) {
-        // Another load was in flight; retry so this sentinel isn't starved.
         setTimeout(pump, 100)
         return
       }
@@ -236,6 +236,7 @@ class ThreadLoader {
       if (exhausted) {
         observer.disconnect()
         sentinel.remove()
+        if (edge === "after") this.onEndReached?.(this.totalPages)
         return
       }
       if (intersecting) pump()
@@ -271,7 +272,10 @@ class LoadStatus {
   }
 }
 
-export const initThreadLoader = (selectors: SelectorConfig) => {
+export const initThreadLoader = (
+  selectors: SelectorConfig,
+  onEndReached?: (lastPage: number) => void
+) => {
   if (!isThreadPage) {
     logger.log("Thread loader: not a thread page.")
     return
@@ -287,5 +291,11 @@ export const initThreadLoader = (selectors: SelectorConfig) => {
   const totalPages = getTotalPages(document, selectors, currentPage)
   logger.log(`Thread loader: page ${currentPage} of ${totalPages}`)
 
-  new ThreadLoader(feed, selectors, currentPage, totalPages).start()
+  new ThreadLoader(
+    feed,
+    selectors,
+    currentPage,
+    totalPages,
+    onEndReached
+  ).start()
 }

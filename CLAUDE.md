@@ -30,7 +30,10 @@ en este punto: habla de un `devMode` editable.)
   genera a partir de ella.
 - `src/utils/storage.ts` — `getEffectiveConfig(key, scope)`: el toggle "General" activa
   la feature en ambas interfaces; si está apagado, manda el toggle por interfaz.
-- `src/lib/` — features (thread-loader, quotes, media, remove-banners).
+- `src/lib/` — features (thread-loader, thread-updater, quotes, media,
+  remove-banners). El thread-updater arranca vía el callback `onEndReached` del
+  thread-loader (o solo, si el infinite scroll está apagado y estás en la última
+  página): nunca antes, o duplicaría posts compitiendo con el loader.
 
 `initQuotes()` e `initMedia()` **solo corren en modo compacto y en la interfaz nueva**
 (vía `applyCompact()`). Sus estilos viven dentro del bloque compacto por eso.

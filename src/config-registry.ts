@@ -3,6 +3,7 @@ import type { ConfigDefinition } from "@/types/config"
 export const CONFIG_KEYS = {
   REMOVE_SIDEBAR: "remove_sidebar",
   INFINITE_SCROLL: "infinite_scroll",
+  AUTO_UPDATE: "auto_update",
   REMOVE_BANNERS: "remove_banners",
   MAX_EAGER_PAGES: "max_eager_pages",
   COMPACT_THREADS: "compact_threads",
@@ -23,6 +24,14 @@ export const configs: ConfigDefinition[] = [
     label: "Cargar hilo completo",
     description:
       "Carga el hilo entero al entrar (hasta 50 páginas); en hilos más largos carga las páginas automáticamente al hacer scroll.",
+    defaultValue: true,
+    type: "checkbox",
+  },
+  {
+    key: CONFIG_KEYS.AUTO_UPDATE,
+    label: "Actualización automática",
+    description:
+      "Al llegar al final del hilo, comprueba periódicamente si hay posts nuevos y los añade sin recargar.",
     defaultValue: true,
     type: "checkbox",
   },

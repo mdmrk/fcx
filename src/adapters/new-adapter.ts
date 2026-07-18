@@ -1,9 +1,11 @@
 import { newSelectors } from "@/config"
 import { CONFIG_KEYS } from "@/config-registry"
 import { initMedia } from "@/lib/media"
+import { initNavButtons } from "@/lib/nav-buttons"
 import { initQuotes } from "@/lib/quotes"
 import { removeBanners } from "@/lib/remove-banners"
 import { initThreadLoader } from "@/lib/thread-loader"
+import { initThreadUpdater } from "@/lib/thread-updater"
 import type { SelectorConfig, SiteAdapter } from "@/types/adapter"
 import { logger } from "@/utils/logger"
 import { isThreadPage } from "@/utils/page-state"
@@ -22,6 +24,7 @@ export class NewSiteAdapter implements SiteAdapter {
     this.removeSidebar()
     this.applyCompact()
     removeBanners("new")
+    initNavButtons()
   }
 
   private applyCompact() {
@@ -44,8 +47,14 @@ export class NewSiteAdapter implements SiteAdapter {
   }
 
   setupFeatures() {
+    const autoUpdate = getEffectiveConfig(CONFIG_KEYS.AUTO_UPDATE, "new")
     if (getEffectiveConfig(CONFIG_KEYS.INFINITE_SCROLL, "new")) {
-      initThreadLoader(this.selectors)
+      initThreadLoader(
+        this.selectors,
+        autoUpdate ? page => initThreadUpdater(this.selectors, page) : undefined
+      )
+    } else if (autoUpdate) {
+      initThreadUpdater(this.selectors)
     }
   }
 }
