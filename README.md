@@ -7,6 +7,7 @@ Mejora la navegación en ForoCoches.
 [![GitHub](https://img.shields.io/badge/GitHub-mdmrk%2Ffcx-blue?style=flat-square&logo=github)](https://github.com/mdmrk/fcx)
 
 <img src=".github/demo.png"/>
+<img src=".github/demo2.gif"/>
 
 ## Índice
 
