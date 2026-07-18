@@ -146,7 +146,10 @@
   color: #ccc;
 }
 
-html.fcx-compact #posts {
+/* The floating preview hangs off <body>, outside #posts, so it has to be listed
+   here explicitly — otherwise the post it clones renders with FC's default,
+   non-compact formatting. */
+html.fcx-compact :is(#posts, #fcx-quote-preview) {
   * {
     transition: none !important;
   }
@@ -297,13 +300,20 @@ html.fcx-compact #posts {
   max-width: 600px;
   max-height: 70vh;
   overflow: hidden;
-  /* No padding: the cloned post section brings its own, and the light gap read
-     as a thick white frame around the preview. */
   padding: 0;
   border: 1px solid #e00;
   pointer-events: none;
   font-size: 0.875rem;
   background: var(--bg-color, #fff);
+}
+
+/* Hide the post action bar (citar/responder/…) in the preview, targeting its
+   wrapper so the separator above it goes too. !important because the wrapper
+   carries an inline display:flex. */
+html.fcx-compact
+  #fcx-quote-preview
+  div:has(> div[style*="justify-content: space-around"]) {
+  display: none !important;
 }
 
 #fcx-media-preview {
