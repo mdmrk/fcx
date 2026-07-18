@@ -29,8 +29,58 @@ const hidePreview = () => {
   if (preview) preview.style.display = "none"
 }
 
+const POST_MESSAGE_PREFIX = "post_message_"
+
+// Reverse index: quoted post id -> (quoting post id -> author name). Pages are
+// loaded out of order and on scroll, so a post is often quoted before it exists
+// in the DOM; entries are kept regardless and rendered whenever the target shows
+// up (see the renderBacklinks call for the post's own id in processMessage).
+const backlinks = new Map<string, Map<string, string>>()
+
 const targetSection = (id: string): HTMLElement | null =>
   document.getElementById(`post${id}`)?.closest("section") ?? null
+
+const postAuthor = (id: string): string =>
+  document
+    .getElementById(`postmenu_${id}`)
+    ?.querySelector("a")
+    ?.textContent?.trim() ?? "post"
+
+const makeQuoteLink = (id: string, name: string): HTMLAnchorElement => {
+  const link = document.createElement("a")
+  link.className = "fcx-ql"
+  link.dataset.id = id
+  link.textContent = `»${name}`
+  return link
+}
+
+/**
+ * Draw the "quoted by" line into the post header, next to the avatar/username.
+ * Idempotent: the line is rebuilt from the index on every call, so it can be
+ * invoked again whenever a new quoting post arrives.
+ */
+const renderBacklinks = (id: string) => {
+  const entries = backlinks.get(id)
+  if (!entries?.size) return
+
+  // #post<id> is the .postbit_wrapper itself; its first row holds the header,
+  // whose first group is the avatar + username block.
+  const header = document.getElementById(`post${id}`)?.firstElementChild
+  const group = header?.firstElementChild
+  if (!group) return
+
+  let line = group.querySelector<HTMLElement>(":scope > .fcx-backlinks")
+  if (!line) {
+    line = document.createElement("div")
+    line.className = "fcx-backlinks"
+    group.append(line)
+  }
+
+  line.textContent = ""
+  for (const [quoterId, name] of entries) {
+    line.append(makeQuoteLink(quoterId, name))
+  }
+}
 
 const quoteTargetId = (squote: Element): string | null => {
   const a = squote.querySelector<HTMLAnchorElement>(":scope > .quote a[href]")
@@ -41,6 +91,9 @@ const quoteTargetId = (squote: Element): string | null => {
 const processMessage = (msg: HTMLElement) => {
   if (msg.dataset.fcxq) return
   msg.dataset.fcxq = "1"
+  const ownId = msg.id.startsWith(POST_MESSAGE_PREFIX)
+    ? msg.id.slice(POST_MESSAGE_PREFIX.length)
+    : ""
   const squotes = Array.from(
     msg.querySelectorAll<HTMLElement>(".squote")
   ).filter(sq => !sq.parentElement?.closest(".squote"))
@@ -49,16 +102,29 @@ const processMessage = (msg: HTMLElement) => {
   line.className = "fcx-quotes"
   for (const sq of squotes) {
     const id = quoteTargetId(sq)
-    if (!id || !targetSection(id)) continue
+    if (!id) continue
+
+    // Record the backlink even when the quoted post isn't loaded yet — it may
+    // arrive on a later page, and renderBacklinks is a no-op until it does.
+    if (ownId && id !== ownId) {
+      let entry = backlinks.get(id)
+      if (!entry) {
+        entry = new Map()
+        backlinks.set(id, entry)
+      }
+      entry.set(ownId, postAuthor(ownId))
+      renderBacklinks(id)
+    }
+
+    if (!targetSection(id)) continue
     const name = sq.querySelector(".quote b")?.textContent?.trim() ?? "post"
-    const link = document.createElement("a")
-    link.className = "fcx-ql"
-    link.dataset.id = id
-    link.textContent = `»${name}`
-    line.append(link)
+    line.append(makeQuoteLink(id, name))
     sq.remove()
   }
   if (line.childElementCount) msg.before(line)
+
+  // Posts that quoted this one may have been processed before it existed.
+  if (ownId) renderBacklinks(ownId)
 }
 
 const processAll = (root: ParentNode = document) => {
@@ -66,12 +132,24 @@ const processAll = (root: ParentNode = document) => {
     processMessage(msg)
 }
 
+/**
+ * Where an expanded post gets inserted. Backlinks live inside the header's flex
+ * row, so anchor them below the whole header instead — inserting into the row
+ * would lay the expanded post out as a flex item and wreck the header.
+ */
+const inlineAnchor = (line: HTMLElement): HTMLElement => {
+  if (!line.classList.contains("fcx-backlinks")) return line
+  const header = line.closest(".postbit_wrapper")?.firstElementChild
+  return header instanceof HTMLElement ? header : line
+}
+
 const toggleInline = (link: HTMLElement) => {
   const id = link.dataset.id
-  const line = link.closest<HTMLElement>(".fcx-quotes")
+  const line = link.closest<HTMLElement>(".fcx-quotes, .fcx-backlinks")
   if (!id || !line) return
+  const anchor = inlineAnchor(line)
 
-  let sib = line.nextElementSibling
+  let sib = anchor.nextElementSibling
   while (sib?.classList.contains("fcx-inline")) {
     const next = sib.nextElementSibling
     if ((sib as HTMLElement).dataset.for === id) {
@@ -87,7 +165,7 @@ const toggleInline = (link: HTMLElement) => {
   box.className = "fcx-inline"
   box.dataset.for = id
   box.append(target.cloneNode(true))
-  line.after(box)
+  anchor.after(box)
 }
 
 const closestQL = (t: EventTarget | null): HTMLElement | null =>
