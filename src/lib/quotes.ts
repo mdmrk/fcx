@@ -46,11 +46,20 @@ const postAuthor = (id: string): string =>
     ?.querySelector("a")
     ?.textContent?.trim() ?? "post"
 
+const isOpPost = (id: string): boolean => {
+  const wrapper = document.getElementById(`post${id}`)
+  for (const el of wrapper?.querySelectorAll(".date-and-time-gray") ?? []) {
+    const text = el.textContent?.trim()
+    if (text && /^#\d+$/.test(text)) return text === "#1"
+  }
+  return false
+}
+
 const makeQuoteLink = (id: string, name: string): HTMLAnchorElement => {
   const link = document.createElement("a")
   link.className = "fcx-ql"
   link.dataset.id = id
-  link.textContent = `»${name}`
+  link.textContent = `»${name}${isOpPost(id) ? " (OP)" : ""}`
   return link
 }
 
