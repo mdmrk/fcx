@@ -252,6 +252,20 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
     /* FC leaves this row at align-items:stretch, so the left group (centered)
        and the right group (bottom) end up on different lines. */
     align-items: center;
+    font-size: 0.75rem;
+
+    /* Username link carries an inline font-size: 1rem, needs !important. */
+    [id^="postmenu_"] a {
+      font-size: inherit !important;
+    }
+
+    /* Explicit value, not `inherit`: the #N wrapper sits inside an <a> with no
+       font-size of its own, so `inherit` would just pick up that <a>'s default
+       instead of cascading past it. */
+    .date-and-time-gray,
+    .date-and-time-gray span {
+      font-size: 0.75rem;
+    }
 
     & > div:last-child {
       flex-direction: row !important;
@@ -268,12 +282,12 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
   }
 
   img.thread-profile-image {
-    width: 28px;
-    height: 28px;
+    width: 24px;
+    height: 24px;
   }
 
   a:has(> img.thread-profile-image) {
-    height: 28px !important;
+    height: 24px !important;
   }
 
   div[style*="margin-left: 28px"] {
@@ -285,6 +299,7 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
     /* Same stacked-layout leftover: knocks the subtitle off the name's baseline. */
     & > .subtitle-small-gray {
       margin-top: 0 !important;
+      font-size: 0.75rem;
     }
   }
 
