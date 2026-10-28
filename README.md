@@ -11,8 +11,8 @@ Mejora la navegación en ForoCoches.
 
 ## Índice
 
-* [Instalación](#instalación)
-* [Características](#características)
+- [Instalación](#instalación)
+- [Características](#características)
 
 ## Instalación
 
@@ -23,6 +23,6 @@ Mejora la navegación en ForoCoches.
 - Scroll infinito: Los hilos cargan sobre demanda hasta un límite de páginas configurable
 - Eliminar banners de publicidad
 - Menú de configuración
-- Compatibilidad con versión antigua y nueva 
+- Compatibilidad con versión antigua y nueva
 - Varios retoques de interfaz y calidad de vida
 - Modo compacto para una navegación más hábil
