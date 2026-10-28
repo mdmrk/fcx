@@ -1,40 +1,8 @@
+import { createFloatingPreview } from "@/utils/floating-preview"
 import { logger } from "@/utils/logger"
-
-const MARGIN = 16
-
-let preview: HTMLElement | null = null
-
-const ensurePreview = (): HTMLElement => {
-  if (preview) return preview
-  preview = document.createElement("div")
-  preview.id = "fcx-quote-preview"
-  document.body.append(preview)
-  return preview
-}
-
-const position = (e: MouseEvent) => {
-  if (!preview) return
-  const { offsetWidth: w, offsetHeight: h } = preview
-  let x = e.clientX + MARGIN
-  if (x + w > window.innerWidth) x = e.clientX - MARGIN - w
-  const y = Math.max(
-    MARGIN,
-    Math.min(e.clientY + MARGIN, window.innerHeight - h - MARGIN)
-  )
-  preview.style.left = `${x}px`
-  preview.style.top = `${y}px`
-}
-
-const hidePreview = () => {
-  if (preview) preview.style.display = "none"
-}
 
 const POST_MESSAGE_PREFIX = "post_message_"
 
-// Reverse index: quoted post id -> (quoting post id -> author name). Pages are
-// loaded out of order and on scroll, so a post is often quoted before it exists
-// in the DOM; entries are kept regardless and rendered whenever the target shows
-// up (see the renderBacklinks call for the post's own id in processMessage).
 const backlinks = new Map<string, Map<string, string>>()
 
 const targetSection = (id: string): HTMLElement | null =>
@@ -63,17 +31,10 @@ const makeQuoteLink = (id: string, name: string): HTMLAnchorElement => {
   return link
 }
 
-/**
- * Draw the "quoted by" line into the post header, next to the avatar/username.
- * Idempotent: the line is rebuilt from the index on every call, so it can be
- * invoked again whenever a new quoting post arrives.
- */
 const renderBacklinks = (id: string) => {
   const entries = backlinks.get(id)
   if (!entries?.size) return
 
-  // #post<id> is the .postbit_wrapper itself; its first row holds the header,
-  // whose first group is the avatar + username block.
   const header = document.getElementById(`post${id}`)?.firstElementChild
   const group = header?.firstElementChild
   if (!group) return
@@ -113,8 +74,6 @@ const processMessage = (msg: HTMLElement) => {
     const id = quoteTargetId(sq)
     if (!id) continue
 
-    // Record the backlink even when the quoted post isn't loaded yet — it may
-    // arrive on a later page, and renderBacklinks is a no-op until it does.
     if (ownId && id !== ownId) {
       let entry = backlinks.get(id)
       if (!entry) {
@@ -132,7 +91,6 @@ const processMessage = (msg: HTMLElement) => {
   }
   if (line.childElementCount) msg.before(line)
 
-  // Posts that quoted this one may have been processed before it existed.
   if (ownId) renderBacklinks(ownId)
 }
 
@@ -141,11 +99,6 @@ const processAll = (root: ParentNode = document) => {
     processMessage(msg)
 }
 
-/**
- * Where an expanded post gets inserted. Backlinks live inside the header's flex
- * row, so anchor them below the whole header instead — inserting into the row
- * would lay the expanded post out as a flex item and wreck the header.
- */
 const inlineAnchor = (line: HTMLElement): HTMLElement => {
   if (!line.classList.contains("fcx-backlinks")) return line
   const header = line.closest(".postbit_wrapper")?.firstElementChild
@@ -191,27 +144,25 @@ export const initQuotes = () => {
     }).observe(posts, { childList: true, subtree: true })
   }
 
+  const preview = createFloatingPreview("div", "fcx-quote-preview", false)
+
   document.addEventListener("mouseover", e => {
     const link = closestQL(e.target)
     const target = link && targetSection(link.dataset.id ?? "")
     if (!target) return
-    const el = ensurePreview()
-    el.innerHTML = target.outerHTML
-    el.style.display = "block"
-    position(e)
-  })
-  document.addEventListener("mousemove", e => {
-    if (preview?.style.display === "block") position(e)
+    preview.show(e, el => {
+      el.innerHTML = target.outerHTML
+    })
   })
   document.addEventListener("mouseout", e => {
-    if (closestQL(e.target)) hidePreview()
+    if (closestQL(e.target)) preview.hide()
   })
   document.addEventListener("click", e => {
     const link = closestQL(e.target)
     if (!link) return
     e.preventDefault()
     toggleInline(link)
-    hidePreview()
+    preview.hide()
   })
   logger.log("Quote tree enabled.")
 }

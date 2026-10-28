@@ -7,9 +7,6 @@ import * as esbuild from "esbuild"
 import { transform as transformCss } from "lightningcss"
 import type PACKAGE_JSON from "./package.json"
 
-// Imports of style files (e.g. `import STYLES from "@/style.css"`) resolve to the
-// file's text, injected at runtime via GM_addStyle. Lightning CSS flattens
-// nesting and (outside dev) minifies before the string is embedded.
 const cssTextPlugin = (dev: boolean): esbuild.Plugin => ({
   name: "css-text",
   setup(build) {
@@ -25,7 +22,6 @@ const cssTextPlugin = (dev: boolean): esbuild.Plugin => ({
   },
 })
 
-// Emitted first, in this order; any other header keys follow.
 const HEADER_ORDER = [
   "@name",
   "@namespace",
@@ -80,7 +76,6 @@ function generateHeader(
   return header
 }
 
-// Every GM api referenced in the bundle must be granted, and vice versa.
 function checkGrants(code: string, header: UserScriptHeader) {
   const grants = Array.isArray(header["@grant"])
     ? (header["@grant"] as string[])
@@ -117,9 +112,14 @@ async function postBuildScript(options: PostBuildOption): Promise<string> {
   if (buildSuffix) {
     header["@version"] += `.${buildSuffix}`
   }
+  header["@icon"] =
+    `data:image/png;base64,${(await readFile("./src/logo.png")).toString("base64")}`
 
   const outputPath = `${path.dirname(entrypointPath)}/${packageJson.name}.user.js`
-  const data = await readFile(entrypointPath, "utf8")
+  const data = (await readFile(entrypointPath, "utf8")).replace(
+    /^\s*\/\/ .*\n/gm,
+    ""
+  )
   checkGrants(data, header)
 
   const pad = Math.max(...Object.keys(header).map(k => k.length))
@@ -154,8 +154,6 @@ async function runBuilderFn(option: BuildOption): Promise<string> {
   const entrypoint = "./src/index.ts"
   const entrypointPath = "./dist/index.js"
 
-  // Userscripts can't have top-level exports: the manager wraps the script in a
-  // plain function, where `export` is a syntax error.
   const indexContent = await readFile(entrypoint, "utf8")
   if (/^export\s+/m.test(indexContent)) {
     throw new Error(
@@ -188,7 +186,6 @@ async function runBuilderFn(option: BuildOption): Promise<string> {
 function watch(option: BuildOption): void {
   const listener: WatchListener<string> = (event, filename) => {
     console.log(`Detected ${event} in ${filename}`)
-    // Keep watching after a failed rebuild; esbuild already printed the error.
     runBuilderFn(option).catch(() => {})
   }
   const watchPaths = [
@@ -238,7 +235,6 @@ async function main() {
 
   const option: BuildOption = { dev: argv.dev, releaseChannel }
 
-  // initial building is always needed, even for watching build
   const userscriptPath = await runBuilderFn(option)
 
   if (argv.server) serve(userscriptPath)

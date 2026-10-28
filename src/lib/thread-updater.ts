@@ -115,7 +115,7 @@ export const initThreadUpdater = (
 
   let page = fromPage
   if (page === undefined) {
-    const current = getCurrentPage()
+    const current = getCurrentPage(selectors)
     if (getTotalPages(document, selectors, current) > current) {
       logger.log("Thread updater: not on the last page.")
       return

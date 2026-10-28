@@ -1,11 +1,4 @@
 #!/usr/bin/env bash
-# Launch a Helium (Chromium) dev instance with remote debugging enabled so the
-# live, logged-in forocoches page can be inspected/driven over CDP (see cdp.mjs).
-#
-# Uses a DEDICATED profile in .helium-dev/ (Chromium refuses remote debugging on
-# the default profile). Log into forocoches once here; the session persists.
-#
-# Usage: ./scripts/dev-browser.sh [url]
 set -euo pipefail
 
 PORT="${CDP_PORT:-9222}"

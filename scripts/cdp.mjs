@@ -1,19 +1,4 @@
 #!/usr/bin/env node
-// Minimal Chrome DevTools Protocol client to develop FCX against the live,
-// logged-in forocoches page running in a Helium (Chromium) dev instance.
-//
-// Start the browser first:  ./scripts/dev-browser.sh
-//
-// Commands (port defaults to 9222, override with CDP_PORT):
-//   node scripts/cdp.mjs tabs                 list open page tabs
-//   node scripts/cdp.mjs html [urlMatch]      dump the page's full HTML
-//   node scripts/cdp.mjs sel '<css>' [match]  test a selector: count + samples
-//   node scripts/cdp.mjs eval '<js>' [match]  evaluate JS in the page, print result
-//   node scripts/cdp.mjs inject [urlMatch]    inject dist/fcx.user.js (with GM shims)
-//   node scripts/cdp.mjs watch  [urlMatch]    hot reload: on each rebuild, reload tab + reinject
-//
-// `urlMatch` picks the tab whose URL contains that substring (default: first
-// forocoches tab, else the first page tab).
 
 const PORT = process.env.CDP_PORT || "9222"
 const BASE = `http://localhost:${PORT}`
@@ -42,7 +27,6 @@ function send(ws, id, method, params) {
   ws.send(JSON.stringify({ id, method, params }))
 }
 
-// Open a websocket to a target and run one Runtime.evaluate, resolving its value.
 function evaluate(wsUrl, expression) {
   return new Promise((resolve, reject) => {
     const ws = new WebSocket(wsUrl)
@@ -69,7 +53,6 @@ function evaluate(wsUrl, expression) {
 
 const sleep = ms => new Promise(r => setTimeout(r, ms))
 
-// Poll until the reloaded page has parsed the DOM (document-end equivalent).
 async function waitReady(wsUrl, tries = 60) {
   for (let i = 0; i < tries; i++) {
     try {
@@ -80,8 +63,6 @@ async function waitReady(wsUrl, tries = 60) {
   }
 }
 
-// The injectable payload: the bundle minus its userscript header, prefixed with
-// shims for the GM APIs it uses so it runs without a userscript manager.
 async function buildInjection() {
   const { readFile } = await import("node:fs/promises")
   const raw = await readFile("./dist/fcx.user.js", "utf8")
@@ -149,8 +130,6 @@ if (cmd === "html") {
     process.exit(1)
   }
   const t = pickTarget(pages, arg2)
-  // Passed straight to Runtime.evaluate: an expression returns its value, and a
-  // statement list returns the completion value of its last expression.
   const val = await evaluate(t.webSocketDebuggerUrl, arg1)
   console.log(typeof val === "string" ? val : JSON.stringify(val, null, 2))
 } else if (cmd === "inject") {
@@ -164,7 +143,6 @@ if (cmd === "html") {
   const match = arg1
   const { watch } = await import("node:fs")
 
-  // Enable infinite scroll for this dev profile so the feature actually runs.
   await evaluate(
     pickTarget(pages, match).webSocketDebuggerUrl,
     'localStorage.setItem("fcx_infinite_scroll", "true")'

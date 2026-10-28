@@ -181,9 +181,6 @@
   color: #ccc;
 }
 
-/* The floating preview hangs off <body>, outside #posts, so it has to be listed
-   here explicitly — otherwise the post it clones renders with FC's default,
-   non-compact formatting. */
 html.fcx-compact :is(#posts, #fcx-quote-preview) {
   * {
     transition: none !important;
@@ -209,7 +206,6 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
     line-height: 1.2;
   }
 
-  /* "Quoted by" backlinks, injected next to the avatar/username in the header. */
   .fcx-backlinks {
     display: flex;
     flex-wrap: wrap;
@@ -241,66 +237,8 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
     height: 2px;
   }
 
-  /* biome-ignore lint/correctness/noUnknownTypeSelector: FC custom element */
   separator {
     margin-bottom: 6px;
-  }
-
-  .postbit_wrapper > div:first-child {
-    gap: 14px;
-    margin-bottom: 4px !important;
-    /* FC leaves this row at align-items:stretch, so the left group (centered)
-       and the right group (bottom) end up on different lines. */
-    align-items: center;
-    font-size: 0.75rem;
-
-    /* Username link carries an inline font-size: 1rem, needs !important. */
-    [id^="postmenu_"] a {
-      font-size: inherit !important;
-    }
-
-    /* Explicit value, not `inherit`: the #N wrapper sits inside an <a> with no
-       font-size of its own, so `inherit` would just pick up that <a>'s default
-       instead of cascading past it. */
-    .date-and-time-gray,
-    .date-and-time-gray span {
-      font-size: 0.75rem;
-    }
-
-    & > div:last-child {
-      flex-direction: row !important;
-      /* Needs !important: the inline align-items:flex-end otherwise wins and
-         drops the date/#N to the bottom, off the username's line. */
-      align-items: baseline !important;
-      gap: 6px;
-
-      /* Leftover from FC's stacked layout; offsets the date now that it's a row. */
-      & > div:first-child {
-        margin-bottom: 0 !important;
-      }
-    }
-  }
-
-  img.thread-profile-image {
-    width: 24px;
-    height: 24px;
-  }
-
-  a:has(> img.thread-profile-image) {
-    height: 24px !important;
-  }
-
-  div[style*="margin-left: 28px"] {
-    align-items: baseline;
-    gap: 8px;
-    margin-left: 10px !important;
-    flex-direction: row !important;
-
-    /* Same stacked-layout leftover: knocks the subtitle off the name's baseline. */
-    & > .subtitle-small-gray {
-      margin-top: 0 !important;
-      font-size: 0.75rem;
-    }
   }
 
   div[style*="justify-content: space-around"] {
@@ -327,6 +265,53 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
       width: 15px !important;
       height: 15px !important;
       margin-right: 0 !important;
+    }
+  }
+
+  .postbit_wrapper > div:first-child {
+    gap: 14px;
+    margin-bottom: 4px !important;
+    align-items: center;
+    font-size: 0.75rem;
+
+    [id^="postmenu_"] a {
+      font-size: inherit !important;
+    }
+
+    .date-and-time-gray,
+    .date-and-time-gray span {
+      font-size: 0.75rem;
+    }
+
+    & > div:last-child {
+      flex-direction: row !important;
+      align-items: baseline !important;
+      gap: 6px;
+
+      & > div:first-child {
+        margin-bottom: 0 !important;
+      }
+    }
+  }
+
+  img.thread-profile-image {
+    width: 24px;
+    height: 24px;
+  }
+
+  a:has(> img.thread-profile-image) {
+    height: 24px !important;
+  }
+
+  div[style*="margin-left: 28px"] {
+    align-items: baseline;
+    gap: 8px;
+    margin-left: 10px !important;
+    flex-direction: row !important;
+
+    & > .subtitle-small-gray {
+      margin-top: 0 !important;
+      font-size: 0.75rem;
     }
   }
 
@@ -357,10 +342,8 @@ html.fcx-compact :is(#posts, #fcx-quote-preview) {
   background: var(--bg-color, #fff);
 }
 
-/* Hide the post action bar (citar/responder/…) in the preview, targeting its
-   wrapper so the separator above it goes too. !important because the wrapper
-   carries an inline display:flex. */
-html.fcx-compact #fcx-quote-preview
+html.fcx-compact
+  #fcx-quote-preview
   div:has(> div[style*="justify-content: space-around"]) {
   display: none !important;
 }

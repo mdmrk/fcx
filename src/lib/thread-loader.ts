@@ -4,9 +4,6 @@ import { logger } from "@/utils/logger"
 import { isThreadPage } from "@/utils/page-state"
 import { getConfig } from "@/utils/storage"
 
-// Threads with more remaining pages than this are loaded progressively (on
-// scroll) instead of all at once, to avoid a flood of requests and a huge DOM.
-// User-configurable via the config panel.
 const DEFAULT_MAX_EAGER_PAGES = 50
 
 const getMaxEagerPages = (): number => {
@@ -16,33 +13,48 @@ const getMaxEagerPages = (): number => {
   return Number.isFinite(v) && v > 0 ? v : DEFAULT_MAX_EAGER_PAGES
 }
 
-// How many page fetches run in parallel while eager-loading a thread.
 const LOAD_CONCURRENCY = 4
 
 const SENTINEL_MARGIN = "600px"
 
+const threadId = (): string | null => {
+  const fromUrl = new URL(window.location.href).searchParams.get("t")
+  if (fromUrl) return fromUrl
+  const input = document.querySelector<HTMLInputElement>('input[name="t"]')
+  if (input?.value) return input.value
+  const link = document.querySelector<HTMLAnchorElement>(
+    'a[href*="showthread.php?t="][href*="page="]'
+  )
+  return link ? new URL(link.href).searchParams.get("t") : null
+}
+
 export const pageUrl = (page: number): string => {
-  const url = new URL(window.location.href)
+  const id = threadId()
+  const url = id
+    ? new URL(`showthread.php?t=${id}`, window.location.href)
+    : new URL(window.location.href)
   url.searchParams.set("page", String(page))
   url.searchParams.delete("goto")
+  url.searchParams.delete("p")
   url.hash = ""
   return url.toString()
 }
 
 const parseCount = (raw: string): number => Number(raw.replace(/\./g, ""))
 
-export const getCurrentPage = (): number => {
-  const raw = new URL(window.location.href).searchParams.get("page")
-  const n = raw ? parseInt(raw, 10) : 1
-  return Number.isFinite(n) && n > 0 ? n : 1
+const positivePage = (raw: string | null | undefined): number | null => {
+  const n = parseInt(raw ?? "", 10)
+  return Number.isFinite(n) && n > 0 ? n : null
 }
 
-/**
- * Total number of pages in the thread. Primary source is the "Mostrando
- * resultados del A al B de TOTAL" indicator (new interface), from which the
- * per-page size — user-configurable, so not hardcoded — is derived. Falls back
- * to the highest `page=` link in the document (old interface / safety net).
- */
+export const getCurrentPage = (selectors: SelectorConfig): number =>
+  positivePage(
+    selectors.resultsInfo &&
+      document.querySelector(selectors.resultsInfo)?.textContent
+  ) ??
+  positivePage(new URL(window.location.href).searchParams.get("page")) ??
+  1
+
 export const getTotalPages = (
   doc: ParentNode,
   selectors: SelectorConfig,
@@ -64,11 +76,8 @@ export const getTotalPages = (
 
   let max = currentPage
   for (const a of doc.querySelectorAll<HTMLAnchorElement>('a[href*="page="]')) {
-    const n = parseInt(
-      new URL(a.href, window.location.href).searchParams.get("page") ?? "",
-      10
-    )
-    if (Number.isFinite(n) && n > max) max = n
+    const n = positivePage(new URL(a.href).searchParams.get("page"))
+    if (n && n > max) max = n
   }
   return max
 }
@@ -90,24 +99,21 @@ class ThreadLoader {
   }
 
   start() {
-    const remaining = this.totalPages - 1 // every page except the current one
+    const remaining = this.totalPages - 1
     if (remaining <= 0) {
       this.onEndReached?.(this.totalPages)
       return
     }
 
     if (remaining <= getMaxEagerPages()) {
-      // Small enough: pull the whole thread (both directions) up front.
       this.eagerLoadAll().then(() => this.onEndReached?.(this.totalPages))
     } else {
-      // Too many pages to bulk-load: fall back to lazy loading on scroll.
       if (this.nextPage <= this.totalPages) this.observe("after")
       else this.onEndReached?.(this.totalPages)
       if (this.prevPage >= 1) this.observe("before")
     }
   }
 
-  /** Run `fn` only when no other load is in flight (single-flight mutex). */
   private async withLock(fn: () => Promise<void>): Promise<boolean> {
     if (this.loading) return false
     this.loading = true
@@ -146,12 +152,10 @@ class ThreadLoader {
       this.feed.insertBefore(document.importNode(node, true), first)
     }
 
-    // Keep the viewport anchored while content is inserted above it.
     root.scrollTop = prevTop + (root.scrollHeight - prevHeight)
   }
 
   private async eagerLoadAll() {
-    // Fetch order: interleave forward/backward so the nearest pages arrive first.
     const queue: number[] = []
     let f = this.currentPage + 1
     let b = this.currentPage - 1
@@ -161,8 +165,6 @@ class ThreadLoader {
     }
 
     const status = new LoadStatus(queue.length)
-    // Pages may finish out of order; buffer them and insert only contiguous runs
-    // so each side stays in page order. Failed pages become [] to not block.
     const ready = new Map<number, Element[]>()
     let nextFwd = this.currentPage + 1
     let nextBwd = this.currentPage - 1
@@ -253,7 +255,6 @@ class ThreadLoader {
   }
 }
 
-/** Floating progress pill shown while a thread is eagerly loaded. */
 class LoadStatus {
   private readonly el: HTMLElement
 
@@ -287,7 +288,7 @@ export const initThreadLoader = (
     return
   }
 
-  const currentPage = getCurrentPage()
+  const currentPage = getCurrentPage(selectors)
   const totalPages = getTotalPages(document, selectors, currentPage)
   logger.log(`Thread loader: page ${currentPage} of ${totalPages}`)
 
